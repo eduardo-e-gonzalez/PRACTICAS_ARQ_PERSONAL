@@ -1,0 +1,33 @@
+             ORG 1000H
+             CHAR      DB "haloha" ;DL
+             FIN       DB 0
+             VOCALESMin DB "aeiou";AL BX
+             RESULTADO DB ?
+             
+ 
+             ORG 3000H
+      CONTAR:MOV CH, 0
+        LOOP:MOV AL,BYTE PTR[BX] ; me pongo en la direccion de comienz
+             CMP AL, 0        ; es el final de la cadena
+             JZ FINISH        ; salto a FINISH si es el final
+             CMP AL, DL       ; COMPARO SI ES VOCAL 
+             JZ SI_ES_VOCAL   ; salto si es a SI_ES_VOCAL
+             JNZ NO_ES_VOCAL
+             INC BX           ;CAMBIO DE LETRA A LA SIGUIENTE 
+             JMP LOOP         ; salto incondicional 
+             
+ NO_ES_VOCAL:JMP LOOP
+             
+ SI_ES_VOCAL:INC CL           ; Si es vocal suma en CL
+             INC BX           ; Paso al otro caracter
+             JMP LOOP         ; salto a LOOP
+        FINISH:RET
+                     
+             
+            ORG 2000h
+            MOV BX, OFFSET VOCALESMin  ;Me posisciono en la dir de VOCALESMin
+            MOV DL,CHAR       ;en DL pongo la letra
+            CALL CONTAR    ; llama a subrrutina
+            MOV RESULTADO, CL  ; muevo resultado de CL a RESULTADO
+            HLT
+            END

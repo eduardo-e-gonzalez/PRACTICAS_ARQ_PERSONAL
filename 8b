@@ -1,0 +1,30 @@
+             ORG 1000H
+             CAD        DB "ab1sz"
+             FIN_CADENA DW 0
+             CANT       DW ?
+             let_a      DB 'a'
+             let_z      DB 'z'
+             
+ 
+             ORG 3000H
+  CONTAR_CAD:MOV CX, 0               ;inicializo CX
+     SEGUIR: MOV AL, [BX]            ;Paso el caracter
+             JZ CORTE
+             CMP AL, let_a           ;Lo comparo con "a"
+             JS SIG                  ;Si es mas chico que "a", salto
+             CMP AL, let_z           ;Comparo con 1+ que "z"
+             JNS SIG                 ;Si no es negativo, significa que me pase
+             INC CX                  ;Si cumple con lo anterior, sumo en mi contador
+ 
+         SIG:INC BX                  ;Recorro los caracteres
+             JMP SEGUIR              ;Voy al principio y vuelvo a preguntar
+       
+       CORTE: RET                ;Termino y paso todo a mi variable cant
+             
+
+            ORG 2000h
+            ;Por referencia via registro
+            MOV BX, OFFSET CAD ;1000h
+            CALL CONTAR_CAD
+            HLT
+            END

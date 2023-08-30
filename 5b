@@ -1,0 +1,18 @@
+            ORG 1000H
+            A  DW  5
+            B  DW  3
+            C  DW  2
+            D  DW  ?
+
+            ORG 3000H
+    MULT:   MOV AX, A
+            ADD AX, B
+            SUB AX, C
+            MOV D, AX
+            RET
+            
+            ORG 2000H
+            CALL MULT
+            RET
+            HLT
+            END

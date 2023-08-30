@@ -1,0 +1,20 @@
+            ORG 1000H
+        CAD DB "longitud"
+        FIN DB 0   
+        
+            ORG 3000H
+      LON:  MOV DX,0
+      LOOP: MOV AH, [BX]
+            CMP AH, 0
+            JZ FINAL
+            INC DX
+            INC AH
+            JMP LOOP
+            RET
+            
+            ORG 2000H
+            MOV BX, OFFSET CAD
+            CALL LON
+            RET
+    FINAL: HLT
+            END

@@ -1,0 +1,46 @@
+             ORG 1000H
+             ORIG      DB 'a' 
+             REEMP     DB 'A'
+             FINAL     DB 0
+             
+ 
+             ORG 3000H
+REEMPLA_CAR:PUSH AX
+            PUSH BX
+            PUSH DX
+            PUSH CX
+            ;TOMO VALOR DE SP
+            MOV BX, SP
+            ;TOMO DIR ORIG
+            ADD BX, 12 
+            MOV AX,[BX]
+            ;TOMO DIR REEMP
+            SUB BX, 2
+            MOV CX,[BX]
+            ;TOMO VAL ORIGINAL
+            MOV BX, AX
+            MOV AX,[BX]
+            MOV DX, BX ;GUARDO PARA NO PERDER BX
+            ;TOMO VAL REMPLAZO
+            MOV BX, CX
+            MOV CX,[BX]
+            ;INSERTO VAL ORIG EN DIR REEMP
+            MOV [BX], AX
+            ;INSERTO VAL REMP EN DIR ORIG
+            MOV BX, DX
+            MOV [BX], CX
+            ;POPs
+            POP AX
+            POP BX
+            POP CX
+            POP DX
+            RET
+
+            ORG 2000h
+            MOV AX, OFFSET ORIG
+            PUSH AX
+            MOV AX, OFFSET REEMP
+            PUSH AX
+            CALL REEMPLA_CAR
+            HLT
+            END

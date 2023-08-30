@@ -1,0 +1,34 @@
+             ORG 1000H
+           CADENA  DB  "HAGATA"
+           CHAR    DB  'A'
+           FIN     DB   0
+           CANT    DB   ?
+             
+ 
+             ORG 3000H
+             MOV DL, 0    ; CONTADOR A 0
+  CONTAR_CAR:MOV AL, [BX] ; ME POSICIONO EN EL PRIMER CARACTER
+             CMP  BYTE PTR [BX], 0 ; ESTOY EN EL FINAL
+             JZ FINISH
+             MOV AH, BYTE PTR [BX]
+             JMP CUMPLE 
+             
+     CUMPLE: CMP AH, CHAR
+             JZ ES_LA_LETRA
+             JNZ NO_ES_CHAR
+             
+  NO_ES_CHAR:INC BX
+             JMP CONTAR_CAR
+             
+ ES_LA_LETRA:INC DL
+             INC BX
+             JMP CONTAR_CAR
+            
+      FINISH:RET
+            
+            ORG 2000h
+            MOV BX, OFFSET CADENA
+            CALL CONTAR_CAR
+            MOV CANT, DL 
+            HLT
+            END

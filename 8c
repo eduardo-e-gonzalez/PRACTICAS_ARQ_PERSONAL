@@ -1,0 +1,29 @@
+             ORG 1000H
+             CHAR      DB 'e'
+             FIN       DB 0
+             VOCALESMin DB "aeiou"
+             RESULTADO DB ?
+             
+ 
+             ORG 3000H
+        LOOP:MOV AL,[BX]      ; me pongo en la direccion de comienz
+             CMP AL, 0        ; es el final de la cadena
+             JZ NO_ES_VOCAL   ; salto si no es vocal a NO_ES_VOCAL
+             CMP AL, DL       ; COMPARO SI ES VOCAL 
+             JZ SI_ES_VOCAL   ; salto si es a SI_ES_VOCAL
+             INC BX           ;CAMBIO DE LETRA A LA SIGUIENTE 
+             JMP LOOP         ; salto incondicional 
+             
+ NO_ES_VOCAL:MOV CL, 00H      ; Si no es vocal devuelve 00H
+             RET
+ SI_ES_VOCAL:MOV CL, 0FFH      ; Si es vocal devuelve 0FFH
+             RET
+                     
+             
+            ORG 2000h
+            MOV BX, OFFSET VOCALESMin  ;Me posisciono en la dir de VOCALESMin
+            MOV DL,CHAR       ;en DL pongo la letra
+            CALL LOOP    ; llama a subrrutina
+            MOV RESULTADO, CL  ; muevo resultado de CL a RESULTADO
+            HLT
+            END

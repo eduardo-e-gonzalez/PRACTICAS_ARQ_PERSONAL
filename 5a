@@ -1,0 +1,17 @@
+            ORG 1000H
+            A  DW  5
+            B  DW  3
+            C  DW  2
+            D  DW  ?
+            
+            ORG 2000H
+            MOV AX, A
+            MOV BX, B
+            MOV CX, C
+           
+            ADD AX, BX
+            SUB AX, CX
+            MOV D, AX
+            
+            HLT
+            END
