@@ -1,0 +1,24 @@
+             ORG 1000H
+        NUM1 DW  6
+        NUM2 DW  3
+        RES  DW  ?
+            
+            ORG 3000H
+   MULT:ADD DX,AX      ;SUMO 1 VEZ EN DX
+        DEC BX         ;RESTO UNA VEZ
+        JZ FIN         ;SI ES 0 FIN
+        JMP MULT       ;SINO ES 0 VUELVO
+        RET
+
+        ORG 2000H
+        MOV DX,0      ;RESULTADO A 0
+        MOV AX, NUM1  ;NUM1 AX
+        CMP AX,0      ;MIENTRAS NO SEA 0
+        JZ FIN        ;SALTO A FIN
+        MOV BX, NUM2  ;NUM2 BH
+        CMP BX,0      ;MIENTRAS NO SEA 0
+        JZ FIN        ;SALTO A FIN
+        CALL MULT
+    FIN:MOV RES, DX
+        HLT
+        END
