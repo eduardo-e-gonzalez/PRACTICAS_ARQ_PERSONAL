@@ -4,13 +4,7 @@
         RES  DW  ?
             
             ORG 3000H
-   MULT:ADD DX,AX      ;SUMO 1 VEZ EN DX
-        DEC BX         ;RESTO UNA VEZ
-        JZ FIN         ;SI ES 0 FIN
-        JMP MULT       ;SINO ES 0 VUELVO
-        RET
-
-        ORG 2000H
+SUBRRUTINA:
         MOV DX,0      ;RESULTADO A 0
         MOV AX, NUM1  ;NUM1 AX
         CMP AX,0      ;MIENTRAS NO SEA 0
@@ -18,7 +12,13 @@
         MOV BX, NUM2  ;NUM2 BH
         CMP BX,0      ;MIENTRAS NO SEA 0
         JZ FIN        ;SALTO A FIN
-        CALL MULT
+   MULT:ADD DX,AX      ;SUMO 1 VEZ EN DX
+        DEC BX         ;RESTO UNA VEZ
+        JNZ MULT       ;SI ES 0 FIN
+    FIN:RET
+
+        ORG 2000H
+        CALL SUBRRUTINA
     FIN:MOV RES, DX
         HLT
         END
