@@ -1,0 +1,15 @@
+             ORG 1000H
+            A  DB  65H
+            
+            ORG 3000H   ; UNA ROTACION ES LA SUMA DE SI MISMO
+  ROTAR_IZQ:ADD AH, AH  ;SUMO EN SI MISMO PARA UNA ROTACION
+            ADC AH, 0   ;VERIFICO SI HAY CARRY
+            RET
+        RET
+
+            ORG 2000H
+        MOV AH, A
+            CALL ROTAR_IZQ  ;PRIMERA ROTACION
+            CALL ROTAR_IZQ  ;SEGUNDA ROTACION
+            HLT
+            END
