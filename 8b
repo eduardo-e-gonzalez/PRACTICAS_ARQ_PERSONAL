@@ -9,6 +9,7 @@
              ORG 3000H
   CONTAR_CAD:MOV CX, 0               ;inicializo CX
      SEGUIR: MOV AL, [BX]            ;Paso el caracter
+             CMP AL, 0
              JZ CORTE
              CMP AL, let_a           ;Lo comparo con "a"
              JS SIG                  ;Si es mas chico que "a", salto
