@@ -1,0 +1,29 @@
+             ORG 1000H
+            A  DB  65H
+            
+            ORG 3000H   ; UNA ROTACION ES LA SUMA DE SI MISMO
+  ROTAR_IZQ:ADD AH, AH  ;SUMO EN SI MISMO PARA UNA ROTACION
+            ADC AH, 0   ;VERIFICO SI HAY CARRY
+            RET
+        RET
+            
+            ORG 4000H   
+ROTAR_IZQ_N:CMP BH,0    ; VERIFICO SI NO SON 0 ROTACIONES
+            JZ FINAL    ;SI ES CERO SALGO
+            CALL ROTAR_IZQ
+            DEC BH
+
+            ORG 4500
+  ROTAR_DER:MOV CH, 8      ;UNA ROT DERECHA ES 8 IZQ - N VECES
+            SUB CH, BH     ;RESTO N VECES A 8 ROT IZQ
+            MOV BH, CH     ;PONGO RESULTADO EN ROTACION IZQ
+            CALL ROTAR_IZQ ; VOY A ROTAR_IZQ_N
+  
+      FINAL:RET
+        
+            ORG 2000H
+            MOV AH, A      ;REGISTRO POR REFERENCIA
+            ADD BH, 6      ;REGISTRO POR VALOR
+            CALL ROTAR_IZQ_N ;SUB ROTACION
+            HLT
+            END
