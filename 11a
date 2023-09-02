@@ -1,0 +1,46 @@
+            ORG 1000H
+            NUM_1     DB  9 ;(AX)
+            NUM_2     DB  3 ;(CX)
+            RESULTADO DB  ? ;(DX)
+            
+            ORG 3000H
+        DIV:PUSH BX     ;GUADO VALORES
+            PUSH AX
+            PUSH DX
+            
+            MOV BX, SP  ;BX=SP
+            ADD BX, 12  ;ME MUEVO EN LA PILA PARA TOMAR NUM_1
+            MOV AX,[BX]
+            SUB BX, 2   ;SUBO 2 PARA TOMAR NUM_2
+            MOV CX,[BX]
+      
+      LOOP: SUB AX, CX ;RESTO NUM_2 A NUM_1
+            JS TERMINE ;SI ES NEGATIVO TERMINE
+            INC DX     ;SUMO EN COCIENTE (CONTADOR)
+            JMP LOOP   ;VUELTO A REPETIR
+            
+    TERMINE:SUB BX, 4  ;MUEVO EN LA PILA PARA PONER EL RESULTADO
+            MOV [BX], DX  ;EN LO QUE APUNTA BX PONGO RESULTADO (DX)
+            POP BX  ;RECUPERO VALORES ORIGINALES
+            POP AX
+            POP DX
+            RET
+
+        
+            ORG 2000H
+            MOV AL, NUM_1        ; AX=NUM_1
+            MOV AH,0
+            PUSH AX              ; NUM_1 A PILA    (2)
+            MOV AH,0
+            MOV AL, NUM_2        ; AX=NUM_2    
+            MOV AH,0
+            PUSH AX              ; NUM_2 A PILA    (4)
+            MOV AL, RESULTADO    ; AX=RESULTADO
+            MOV AH,0
+            PUSH AX              ; NUM_1 A PILA    (6)
+
+            CALL DIV             ;LLAMO SUBRUTINA  (8 IP)+(2 SP)
+            
+            POP CX               ;TRAIGO DE PILA EL RESULTADO A CX
+            HLT
+            END
