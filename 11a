@@ -31,7 +31,6 @@
             MOV AL, NUM_1        ; AX=NUM_1
             MOV AH,0
             PUSH AX              ; NUM_1 A PILA    (2)
-            MOV AH,0
             MOV AL, NUM_2        ; AX=NUM_2    
             MOV AH,0
             PUSH AX              ; NUM_2 A PILA    (4)
