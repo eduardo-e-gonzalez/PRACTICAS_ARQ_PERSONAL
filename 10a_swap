@@ -1,1 +1,53 @@
-
+             ORG 1000H
+            DATO1  DW  6500H
+            DATO2  DW  6600H
+            
+            ORG 3000H
+            ;GUARDO VALORES DE REGISTROS
+      SWAP: PUSH AX
+            PUSH BX
+            PUSH CX
+            PUSH DX
+            ;GUARDO SP EN BX
+            MOV BX, SP
+            ;TOMO DIR DATO1
+            ADD BX, 12    ;VAJO HASTA EL PRIMER PUSH QUE ES DATO1
+            MOV AX, [BX]  ;AX VALOR DE DATO1
+            
+            ;TOMO DIR DATO2
+            SUB BX, 2      ; BAJO 2 POSICIONES A DATO2 EN PILA
+            MOV CX, [BX]   ; TOMO DIR DE DATO2
+            
+            ;TOMO VALOR DATO1 Y RESPALDO BX
+            MOV BX, AX    ;BX DIR DATO1
+            MOV AX,[BX]   ;AX VALOR DATO1
+            MOV DX, BX    ;RESPALDO BX
+            
+            ;TOMO VALOR DATO2
+            MOV BX, CX    ;BX DIR DATO2
+            MOV CX,[BX]   ;CX VALOR DATO2
+            
+            ;INSERTO DATO1 EN DIR DE DATO2
+            MOV [BX], AX  ;DIR DATO2 A DATO1
+            
+            ;INSERTO DATO2 EN DIR DE DATO1
+            MOV BX, DX  ;DIR DATO|
+            MOV[BX], CX  ;DIR DATO1 A DATO2
+            
+            ;RECUPERO VALORES DE REGISTROS
+            POP DX
+            POP CX
+            POP BX
+            POP AX
+            RET
+            
+           
+        
+            ORG 2000H
+            MOV AX, OFFSET DATO1
+            PUSH AX
+            MOV AX, OFFSET DATO2
+            PUSH AX
+            CALL SWAP
+            HLT
+            END
