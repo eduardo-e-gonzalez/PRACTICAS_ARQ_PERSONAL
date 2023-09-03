@@ -1,0 +1,23 @@
+            ORG 1000H
+            MSJ     DB "INGRESE UN CARACTER"  ;MSJ QUE DICE QUE DEBO HACER
+            FIN     DB ?                      ;FIN
+            
+            ORG 1500
+            NUM  DB  ?                        ;NUMERO A INGRESAR ?
+            
+            ORG 2000H
+            MOV BX, OFFSET MSJ                ;COMIENZO DE L MENSAJE 
+            MOV AL, OFFSET FIN-OFFSET MSJ     ;CALCULO DE CUANTAS LETRAS IMPRIMIRE
+            INT 7                             ;IMPRIME MENSAJE
+            
+            MOV BX, OFFSET NUM                ;ME PONGO EN DIR DEL CARACTER A INGRESAR
+            INT 6                             ;INGRESO DE TECLADO
+            MOV AL, 1                         ;CUANTOS CARACERES IMPRIMIRE
+            INT 7                             ;IMPRIMO ENPANTALLA
+            MOV CL, NUM                       ;GUARDA EL VALOR DE NUM EN CL
+            INT 0
+            END
+
+            A- BX EL COMIENZO DE LA CADENA Y AL CUANTAS LETRAS IMPRIMIRE
+            B-ALMACENA LA DIRECCION DONDE DE NUM(A INGRESAR)
+            C-EL SEGUNDO INT 7 IMPRIME LA LETRA INGRESADA POR TECLADO
