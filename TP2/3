@@ -1,0 +1,14 @@
+            ORG 1000H
+            A_MAY   DB 41H      ;A MAYUSCULA
+            a_MIN   DB 61H      ;a MINUSCULA
+            Z_FINAL DB 'Z'      ;ULTIMA MATYUSCULA, Z
+            
+            ORG 2000H
+            MOV AL, 2            ;CANTIDAD A IMPRIMIR EN AL
+            MOV BX, OFFSET A_MAY ;DIR DE A_MAY
+      LOOP: INT 7                ;INPRIMO EN PANTALLA
+            INC A_MAY            ;SIGUIENTE CARACTER
+            INC a_MIN            ;SIGUIENTE CARACTER
+            CMP A_MAY, 'Z'+1     ;VEO SI NO LLEGUE AL FINAL Z+1
+            JNZ LOOP             ;SI NO LLEGUE AL FINAL VOY A OTRO CARACTER
+            INT 0                ;HLT
