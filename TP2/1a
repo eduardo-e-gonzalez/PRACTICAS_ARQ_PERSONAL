@@ -1,1 +1,14 @@
-
+         ORG 1000H
+ MENSAJE DB "ARQUITECTURA DE COMPUTADORAS-"
+         DB "FACULTAD DE INFORMATICA-"
+         DB 55H ;  U
+         DB 4EH ;  N
+         DB 4CH ;  L
+         DB 50H ;  P
+     FIN DB ?
+         ORG 2000H
+         MOV BX, OFFSET MENSAJE  ;principio de la cadena
+         MOV AL, OFFSET FIN - OFFSET MENSAJE ;cant de carac teres
+         INT 7    ;imprime en pantalla
+         INT 0    ;hlt
+         END
