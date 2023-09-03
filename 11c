@@ -1,0 +1,25 @@
+             ORG 1000H
+            NUM_1H     DW  3000H ;(ALTA NUM 1)
+            NUM_1L     DW  2000H ;(BAJA NUM 1)
+            NUM_2H     DW  3000H ;(ALTA NUM 2)
+            NUM_2L     DW  2000H ;(BAJA NUM 2)
+            RES_H      DW  ? ;(RESULTADO ALTA)
+            RES_L      DW  ? ;(RESULTADO BAJA)
+            TOTAL      DW  ? ;TOTAL
+            
+            
+        
+            ORG 2000H
+            MOV AX,NUM_1H
+            MOV BX,NUM_1L
+            MOV CX, NUM_2H
+            MOV DX, NUM_2L
+            
+            ADD BX,DX
+            ADD AX,CX
+            MOV RES_L,BX
+            MOV RES_H,AX
+            ADD BX, RES_L
+            MOV TOTAL, BX
+            HLT
+            END
