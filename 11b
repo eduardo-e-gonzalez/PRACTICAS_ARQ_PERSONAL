@@ -1,0 +1,29 @@
+            ORG 1000H
+            NUM_1     DB  9 ;(AL)
+            NUM_2     DB  4 ;(AH)
+            RESULTADO DB  ? ;(DL)
+            
+            ORG 3000H
+      RESTO:MOV CL, 0    ;CL ES EL RESTO DE LA DIV EN 0
+            MOV DL, 0    ;DL COCIENTE EN CERO
+            CMP AL, 0    ;NUM_1 ES 0? SI ES TERMIN0
+            JZ FIN
+            CMP AH, 0    ;NUM_0 ES 0? SI ES TERMIN0
+            JZ FIN
+            
+        DIV:SUB AL, AH   ;9-4=5/5-4=1/1-4=-3
+            JS RES
+            INC DL
+            JMP DIV
+        RES:ADD AL,AH    ;-3+4=1 EN AL
+            MOV DL,AL    ;RESTO EN DL=1
+        FIN:RET
+
+        
+            ORG 2000H
+            MOV AL, NUM_1        ; AL=NUM_1
+            MOV AH, NUM_2        ; AH=NUM_2    
+            CALL RESTO           ;LLAMO SUBRUTINA 
+            
+            HLT
+            END
