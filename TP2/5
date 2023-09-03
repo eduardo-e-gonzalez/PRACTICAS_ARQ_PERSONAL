@@ -1,0 +1,46 @@
+            ORG 1000H
+            MSJ     DB "INGRESE UN CARACTER "  ;MSJ QUE DICE QUE DEBO HACER
+            FEN     DB ?
+            NO_ES   DB " CARACTER INVALIDO" 
+            FIN     DB  ?                     ;FIN
+            
+            ORG 1500
+            NUM  DB  ?                        ;NUMERO A INGRESAR ?
+
+            ORG 3000
+      LOOP: INT 6                             ;INGRESO DE TECLADO
+            MOV AL, 1                         ;CUANTOS CARACERES IMPRIMIRE
+            INT 7                             ;IMPRIMO ENPANTALLA
+            MOV CL, NUM                       ;GUARDA EL VALOR DE NUM EN CL
+            CMP NUM, 30H                      ;COMPAR EL CARACTER SI ES CERO
+            JS NO_NUM                         ;SI ES NEGATIVO TERMINE
+            CMP NUM, 39H +1                   ;COMPARO CON EL SIGUIENTE NUEVE(9+1)
+            JNS NO_NUM                         ;SI ES NEGATIVO ES NUMERO
+            JMP ES_NUM
+    
+     NO_NUM:MOV DH, CH                         ;PONGO EN DH 0FFH(NO ES NUMERO)
+            MOV BX, OFFSET NO_ES               ;VOY A LA DIR DE LA CADENA NO_ES
+            MOV AL,OFFSET FIN-OFFSET NO_ES     ;CALCULO CUANTO VOY A IMPRIMIR EM AL
+            INT 7                              ;IMPRIMO EN PANTALLA
+            RET
+           
+     ES_NUM:MOV CX, 00H                        ;PONGO EN CX 00H YA QUE E SNUMERO
+            RET
+          
+            ORG 2000H
+            MOV BX, OFFSET MSJ                ;COMIENZO DE L MENSAJE 
+            MOV AL, OFFSET FEN-OFFSET MSJ     ;CALCULO DE CUANTAS LETRAS IMPRIMIRE
+            INT 7                             ;IMPRIME MENSAJE
+           
+            MOV CH, 0FFH        ;??            ;SI ES NUMERO
+            MOV DL, 00H         ;??           ;SI NO ES NUMERO
+            MOV BX, OFFSET NUM                ;ME PONGO EN DIR DEL CARACTER A INGRESAR
+            
+            CALL LOOP
+            MOV CL, NUM                        ;PONGO NUM INGRESADO EN CL
+            
+            INT 0
+            END
+
+          
+            
