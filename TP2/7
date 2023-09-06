@@ -1,0 +1,52 @@
+                ORG 1000H
+                MSJ     DB  " INGRESE DOS NUMEROS "
+                MSJR    DB  " EL RESULTADO ES "
+                NUM1    DB  ?  ;0-9
+                NUM2    DB  ?  ;0-9
+                RES1    DB  ?  ;SOLO PUEDE SER 1 O 2 (MX 9+9=18)
+                RES2    DB  ?  ;0 A 9
+                FIN     DB  ?
+                        
+                ORG 3000H
+        IN_NUM:MOV BX, OFFSET NUM1
+               INT 6    ;ESPERO INGRESO NUM1      
+               MOV BX, OFFSET NUM2
+               INT 6    ;ESPERO INGRESO NUM2
+               JMP CONVER
+
+        NORMAL:MOV BX, OFFSET RES1
+               MOV RES1, 0
+               MOV RES2, CL
+               JMP IMPRIMO
+      --------------PORQUE NO SUMA???---------------
+         CONVER:MOV CL, NUM1  ;PONGO NUM1 EN CL
+                SUB CL, 30H   ;PASO A ASCII EN NUMERO
+                MOV DL, NUM2  ;PONGO NUM1 EN DL
+                SUB DL, 30H   ;PASO A ASCII EN NUMERO
+                ADD CL, DL    ;SUMO AMBOS NUMEROS
+                CMP CL, 3AH   ;COMPARO SI ESTA ENTRE 0-9
+                JS  NORMAL    ;SI ES VOY A 
+         
+         MASDE9:SUB CL, 10
+                MOV RES2,CL
+                INC DL
+                MOV RES1, DL
+                
+        IMPRIMO:MOV BX, OFFSET MSJR
+                MOV AL, OFFSET RES1-OFFSET MSJR
+                INT 7
+                MOV BX, OFFSET RES1
+                MOV AL, 2
+                INT 7
+                RET
+                          
+                ORG 2000H
+                MOV BX, OFFSET MSJ
+                MOV AL, OFFSET MSJR-OFFSET MSJ
+                INT 7
+                
+
+                CALL IN_NUM
+                
+                INT 0
+                END
