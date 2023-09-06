@@ -50,3 +50,39 @@
                 
                 INT 0
                 END
+
+
+Entiendo el problema que mencionas. El código actual no está manejando adecuadamente el caso en el que la suma de los números sea menor o igual a 9, lo que debería mostrar el resultado como "9" en lugar de mostrar los dígitos por separado. Para corregir este problema, puedes hacer lo siguiente:
+
+Elimina la etiqueta MASDE9 y la parte del código relacionada con el acarreo. No es necesario para este caso.
+
+En lugar de realizar una comparación en CMP CL, 3AH, simplemente ve a la etiqueta NORMAL si la suma de CL y DL es menor o igual a 9.
+
+Aquí está la parte corregida del código:
+
+assembly
+Copy code
+        CONVER:MOV CL, NUM1  ; PONGO NUM1 EN CL
+                SUB CL, 30H   ; PASO A ASCII EN NUMERO
+                MOV DL, NUM2  ; PONGO NUM2 EN DL
+                SUB DL, 30H   ; PASO A ASCII EN NUMERO
+                ADD CL, DL    ; SUMO AMBOS NUMEROS
+                CMP CL, 9     ; COMPARO SI ESTA ENTRE 0-9
+                JLE NORMAL    ; SI ES MENOR O IGUAL A 9, IR A NORMAL
+         
+        ; Si la suma es mayor que 9, llegará aquí
+        ; No es necesario manejar el acarreo en este caso
+
+        NORMAL:MOV RES1, CL   ; Almacena el resultado en RES1
+                MOV RES2, 0    ; Reinicia RES2 a 0
+                
+        IMPRIMO:MOV BX, OFFSET MSJR
+                MOV AL, RES1
+                INT 7
+                RET
+Con estas correcciones, el programa debería funcionar correctamente para sumar dos números de un solo dígito y mostrar el resultado como "9" en lugar de mostrar los dígitos por separado cuando la suma sea menor o igual a 9.
+
+
+
+
+
