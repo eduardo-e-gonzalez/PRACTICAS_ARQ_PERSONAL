@@ -1,0 +1,68 @@
+          ORG 1000H
+          
+          N0        DB  "CERO  "
+          N1        DB  "UNO   "
+          N2        DB  "DOS   "
+          N3        DB  "TREA  "
+          N4        DB  "CUATRO"
+          N5        DB  "CINCO "
+          N6        DB  "SEIS  "
+          N7        DB  "SIETE "
+          N8        DB  "OCHO  "
+          N9        DB  "NUEVE "
+          MSJ_ING   DB  " INGRESE UN CARACTER "
+          MSJ_N_NUM DB  " NO ES NUMERO, REINTENTE "          
+          FIN       DB  0
+
+          ORG 1500H
+          NUM  DB  ?
+          
+          ORG 300H    
+          MOV DH,2       ;DEVO TENER 2 0 CONCECUTUVIS
+  ING_NUM:CMP NUM, 30H    ;COMPARO SI ES 0 SUMA        
+          JZ  SUMA       ;SI ES CERO (0)
+          CMP NUM, 39H+1  ;COMPARA CON 9+1
+      SIG:JS  NO_ES_CER  ;SI ES NEGATIVO NO ES NUMERO
+          JMP ING_NUM    ;VUELVO A PEDIR INGRESO 
+
+     SUMA:ADD DL,1    ;SI ES CERO PONGO 1 EN DL
+          CMP DL,DH   ;SI ES EL SEGUNDO 0 DARA 2
+          JNZ ING_NUM    ;VUELVO A PEDIR INGRESAR SI NO ES 0
+          JZ  FINAL       ;SI DA 0, TERMINE
+            
+NO_ES_CER:ADD DL, 0  ;COMO NO ES CERO REINICIO DL A 0
+          CMP DL,DH  ;SI ES EL SEGUNDO 0 DARA 2 Y SALGO 
+          MOV BX, OFFSET MSJ_N_NUM    ;ME POSICIONO EN PRINCIPIO DE LA MSJ_N_NUM
+          MOV AL, OFFSET FIN-OFFSET MSJ_N_NUM ;VEO CUANTO IMPRIMIRE
+          INT 7    ;IMPRIMO EN PANRTALLA
+          JMP ING_NUM    ;SALTO A INGRESAR CARACTER
+
+    SIGUE:MOV BX, OFFSET N0  ;VOY A DIR DE CERO
+          MOV AL, 6          ;CANT A IMPRIMIR
+     LOOP:CMP NUM, 30H       ;NUM ES 0?
+          JZ IMPRIME
+          ADD BX, 6          ;SUMO 6 PARA PASAR AL OTRO NUMERO
+          DEC NUM             ;DEC MI VALOR PARA ENCONTRAR EL NUEMERO
+          JMP LOOP          
+          ; BX ES CADA NUMERO DE 6 EN 6, 1000H=0, 1006H=1...
+          ; NUM=3 Y BX 0(1000H), 3=0? NO, 
+          ; DEC NUM, NUN=2 Y BX 1(1003H), 2=0 NO,
+          ; DEC NUM, NUM=1 Y BX 2(1006H), 1=0 NO
+          ; DEC MUM, NUM=0 Y BX 3(1009H). 0=0 SI
+          ;IMPRIMO 
+  IMPRIME:INT 7      ;IMPRIMO EN PANTALLA
+          CMP DL, DH ;COMPARO DL CON 2 SI ES 9 SON 2 CEROS CONCECUTIVOS
+          JNZ ING_NUM;SI NO ES 0, PIDO OTRO
+    FINAL:RET
+        
+          ORG 2000H
+          MOV BX, OFFSET MSJ_ING
+          MOV AL, OFFSET MSJ_N_NUM-OFFSET MSJ_ING ;CUANTOS VOY A IMPRIMIR
+          INT 7      ;IMPRIMO EN PANRTALLA
+          MOV BX, OFFSET NUM  ;POSICIONO EN MSJ_N_NUM
+          INT 6
+        
+          
+          CALL ING_NUM
+          INT 0
+          END
