@@ -5,7 +5,8 @@
             MOV BX, OFFSET CHAR  ;PRINCIPIO DE LA CADENA
             MOV AL, 1               ;CANTIDAD QUE IMPRIMO
     REPETIR:INT 7                   ;IMPRIMO EN PANTALLA
-            INC BYTE PTR [BX]       ;PASO A OTRO ASCII
+            INC BYTE PTR [BX]       ;PASO A OTRO ASCII, 
+                                    ;si no hago BYTE PTR muevo de a 2 ASCII
             CMP BYTE PTR [BX], 7FH  ;COMPARO SI NO ES 0
             JNZ REPETIR
             INT 0    ;hlt
