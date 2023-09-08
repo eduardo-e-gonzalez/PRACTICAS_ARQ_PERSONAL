@@ -34,7 +34,6 @@
             INT 7                             ;IMPRIMO ENPANTALLA
            
             MOV BX, OFFSET NUM                ;ME PONGO EN DIR DEL CARACTER A INGRESAR
-            INT 6
             CALL ES_NUM
             MOV CL, NUM                        ;PONGO NUM INGRESADO EN CL
             
