@@ -1,0 +1,75 @@
+          
+          ORG 1000H                          
+          MSJ DB "INGRESE UN NUMERO: "
+          FIN DB 00H
+          
+          ORG 1500H                  
+          NUM1 DB ?
+          NUM2 DB ?
+          SIGNO DB "-"               ;NEGATIVO
+          RESULTADO DB ?
+          SIGN DB "+"                ;POSITIVO
+          RESULTAD DB ?        
+          
+          ORG 3000H
+          
+ NEGATIVO:SUB AH, AL         ;AL REVES EN NEGATIVO(EJ: SI 4-8=-4 8-4=4)
+          MOV AL, AH         ;PASO AL A AH
+          ADD AL, 30H        ;PASO A DECIMAL
+          MOV BX, OFFSET RESULTADO  ;DIR DE RESULTADO
+          MOV [BX], AL              ;PONGO EL RESULTADO (NEGATIVO)
+               
+          MOV BX, OFFSET SIGNO    ;DIR DEL SIGNO
+          MOV AL, 2               ;2 A IMPRIMIR
+          INT 7
+          
+          RET
+
+ POSITIVO:SUB AL, AH               ;RESTA NORMAL
+          ADD AL, 30H              ;PASO A DECIMAL
+          MOV BX, OFFSET RESULTAD  ;VOY A DIR DE RESULTAD
+          MOV [BX], AL             ;PONGO EL RESULTADO (POSITIVO)
+          
+          MOV BX, OFFSET SIGN      ;DIR DEL SIGNO
+          MOV AL, 2                ;2 A IMPRIMIR
+          INT 7
+          
+          RET
+    
+    RESTA:MOV BX, OFFSET NUM1
+          INT 6
+          MOV BX, OFFSET NUM2
+          INT 6
+          
+          MOV AL, NUM1 ;AL CON NUM1
+          MOV AH, NUM2 ;AH CON NUM2
+          
+          SUB AL, 30H ; AL LO TENGO EN SU VALOR DECIMAL
+          SUB AH, 30H ;AH LO TENGO EN DECIMAL
+          
+          CMP AL, AH    ;NUM1 - NUM2 Y LO GUARDO EN AL
+          JS NEGATIVO   ;HARE NUM2 -NUM1(DIO NEGATIVO)
+          JNS POSITIVO  ;HARE NUM1-NUM2(DIO POSITIVO)
+          
+          RET
+          
+          
+          ORG 2000H
+          MOV BX, OFFSET MSJ
+          MOV AL, OFFSET FIN - OFFSET MSJ
+          INT 7 ;INGRESE UN NUMERO
+          
+          PUSH AX
+          PUSH BX
+          PUSH CX      
+          PUSH DX      
+          
+          CALL RESTA
+          
+          POP DX 
+          POP CX
+          POP BX       
+          POP AX
+          
+          INT 0
+          END
