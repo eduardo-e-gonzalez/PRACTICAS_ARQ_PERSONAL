@@ -1,0 +1,58 @@
+            ////////////NO FUNCIONA, REVISAR///////
+            //////////SIEMPRE VA A DENEGADO///////
+            
+            ORG 1000H                          
+            MSJ  DB "INGRESE UNA CLAVE DE 4 DIGITOS: "
+            MSJ1 DB " ACCESO PERMITIDO "
+            MSJ2 DB " ACCESO DENEGADO"
+            FIN  DB 00H
+            
+            ORG 1500H                  
+            CLAVE DB "A1B2"       
+            CANT  DB 4
+            NUM   DB ?
+            
+              
+              ORG 3000H
+             MOV DH, 4 ;FIJO CONTADOR, LLEGA A 4, FIN
+     
+  
+     INGRESO:MOV BX,SP    ;TOMO DIR DE SP
+             ADD BX, 2    ;VOY A CLAVE EN LA PILA SP+2
+         SIG:MOV CL, [BX] ;PONGO EN CL A LO QUE APUNTA BX=CLAVE
+             MOV DX, BX   ;COPIA DE SEGURIDAD DE BX
+             MOV BX, OFFSET NUM ;ME PONGO EN DIR DE NUM
+             INT 6              ;INGRESO CARACTER POR TECLADO
+             CMP CL, [BX]    ;COMPARO GUARDADO Y CARACTER INGRESADO
+            
+             JNZ DENEGADO   ;SI ES DISTINTO SALTO A INCORECTO
+             MOV BX, DX     ;DEVUELVO A BX LA POSICION DONDE ESTABA
+             INC BX         ;PASO AL SIGUIENTE CARACTER
+             DEC CANT       ;DECREMENTO LA CANTIDAD(DEBE LEER 4 DIGITOS)
+             
+             JNZ INGRESO    ;SI NO ES CERO VUELVOA COMPRARA OTRO CARACTER
+             CMP CANT, 0    ;//CREO QUE ES REUNDANTE//
+             JZ PERMITIDO   ;CLAVE CORRECTA SALTO A MENSAJE 
+             
+    DENEGADO:MOV BX, OFFSET MSJ2
+             MOV AL, OFFSET FIN-OFFSET MSJ2
+             INT 7
+             JMP TERMINAR
+    
+   PERMITIDO:MOV BX, OFFSET MSJ1
+             MOV AL, OFFSET MSJ2-OFFSET MSJ1
+             INT 7
+    TERMINAR:RET
+                  
+            ORG 2000H
+            MOV BX, OFFSET MSJ
+            MOV AL, OFFSET MSJ1 - OFFSET MSJ
+            INT 7 
+            MOV BX, OFFSET CLAVE
+            PUSH BX
+
+            CALL INGRESO   
+            POP AX
+            
+            INT 0
+            END
