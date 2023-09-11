@@ -14,8 +14,6 @@
             
               
               ORG 3000H
-             MOV DH, 4 ;FIJO CONTADOR, LLEGA A 4, FIN
-     
   
      INGRESO:MOV BX,SP    ;TOMO DIR DE SP
              ADD BX, 2    ;VOY A CLAVE EN LA PILA SP+2
@@ -45,6 +43,7 @@
     TERMINAR:RET
                   
             ORG 2000H
+            MOV DH, 4 ;FIJO CONTADOR, LLEGA A 4, FIN
             MOV BX, OFFSET MSJ
             MOV AL, OFFSET MSJ1 - OFFSET MSJ
             INT 7 
