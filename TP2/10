@@ -1,0 +1,47 @@
+        PIC     EQU 20H    ;DIR DEL PIC
+        ;EL PIC NOS AVISA QUE DISPOSITIVO NOS QUIERE INTERRUMPIR
+        EOI     EQU 20H    ;DIR DE EOI 
+        ;EOI=20H, IMR=21H, IRR=22H, ISR=23H
+        ;INT0=24H/F10, INT1=25H/TIMER, INT2=26H/HS, INT3=27H/CDMA
+        N_F10   EQU 10     ;ID DEL F10 ESTE ES EL QUE SE MULTIPLICA X4
+        ID5     EQU 20
+        
+        ORG 40
+        ID_F10  DW  CONTAR
+        
+        ORG 3000H
+CONTAR: PUSH AX      ;GUARDO VALOR DE AX
+        INC DX       ;SUMO 1 AL OPRIMIR F10
+        OUT AL, EOI  ;EOI=20H
+        MOV EOI, AL  ;20H=EOI. PUEDO PONER "MOV 20H, AL"
+        POP AX       ;RECUPERO VALOR ORIGINAL DE AX
+        IRET
+        
+        ORG 2000H
+        CLI
+        MOV AL, 0FEH
+        OUT PIC+1, AL  ;PIC; REGISTRO IMR=21H
+        MOV AL, N_F10   ;ID F10=10
+        OUT PIC+4, AL   ;INT0=24H=PIC+4=F10
+        MOV DX, 0       ;INICIALIZO CONTADOR DX
+        STI
+        
+   LAZO:JMP LAZO       ;LOOP INFINITO
+        INT 0 
+        END
+
+      ;    A-  EOI=20H
+      ;        IMR=21H
+      ;        IRR=22H
+      ;        ISR=23H
+      ;        INT0= TERMINA EL PROGRAMA (=HLT)
+      ;        INT3= DEBUG
+      ;        INT6= LEER CARACTER DESDE TECLADO
+      ;        INT7= IMPRIME STRING EN PANTALLA     
+      
+      ;    B-LOS REGISTROS PROGRAMABLES SON 
+      ;      IN: LEE DESDE MEMORIA E/S   SOLO CON AL
+      ;      OUT: ESCRIBE EN MEMORIA E/S SOLO CON AL
+
+      ;    C-CLI Y STI SE USA PARA EVITAR INTERRUPCIONES 
+      ;      MIENTRAS QUE UNA INTERRUPCION SE ESTA ATENDIENDO
