@@ -1,0 +1,39 @@
+        PIC_0   EQU 20H
+        IMR_1   EQU 21H ;PIC+1
+        ISR_2   EQU 22H ;NO LO USO SOLO DE GUIA 
+        IRR_3   EQU 23H ;NO LO USO SOLO DE GUIA 
+        F10_4   EQU 24H ;PIC+4
+        TIME_5  EQU 25H ;NO LO USO SOLO DE GUIA 
+        HS_6    EQU 26H ;NO LO USO SOLO DE GUIA 
+        
+        ORG 1000H
+        CHAR  DB  "A"
+        
+        ORG 3000 ; la sub soo es llamada cuando se toca f10
+CONTAR: INT 7
+        MOV AL, 20H
+        OUT 20H, AL
+        IRET
+        
+        ORG 2000H
+        MOV BX, CONTAR  ;ME POSICIONO EN DIR DE LA SUB_R
+        MOV BX, 40            ;ID=10X4=40
+        MOV[BX],AX            ;PONGO EN 40 LA DIR DE 3000H
+                  
+                  ;CONFIGURO EL PIC
+        CLI
+        MOV AL, 11111110b;PONGO QUE VOY A ATENDER EN AL
+        OUT IMR_1, AL     ;LO DE AL LO PONGO EN IMR
+        MOV AL, 10      ;EN AL PONGO EL VALOR DE ID=10
+        OUT F10_4, AL     ; ESCRIBE EN LA DIR DE F10 EL VALOR DEL ID
+        STI
+
+        MOV BX, OFFSET CHAR       ;ME POSICIONO EN LA LETRA DE INICIO
+REINICIO:MOV BYTE PTR[BX], 41H-1  ;ME PONGO EN LA LETRA A -1(ME SIRVE PARA EL LOOP
+   LOOP:INC BYTE PTR[BX]          ;EMPIEZO CON LA LETRA A
+        CMP BYTE PTR[BX],5AH     ;LLEGUE A LA Z? REINICIO O LOOP?
+        JZ REINICIO               ;VUELVO A EMPEZAR EL CICLO, LLEGUE AL FINAL
+        JMP LOOP                  ;SIGUIENTE LETRA 
+      
+        INT 0 
+        END
