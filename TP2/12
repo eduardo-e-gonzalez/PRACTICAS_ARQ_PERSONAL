@@ -1,0 +1,59 @@
+//////VAN ENCAMINADO PERO ...///
+                CONT     EQU  10H
+                COMP     EQU  11H
+                EOI_0    EQU  20H
+                IMR_1    EQU  21H
+                ISR_2    EQU  22H
+                IRR_3    EQU  23H
+                F10_4    EQU  24H
+                TIMER_5  EQU  25H
+                N_CLK    EQU  10
+                ORG 40
+                DIR_SUB  DW SUB_RUT
+                
+                ORG 1000H
+               SEG  DB  30H  ;30H=0, COMIENZA EN 0 SEG
+               MIN  DB  30H  ;30H=0, COMIENZA EN 0 MIN
+               FIN  DB  ?
+                        
+                ORG 3000H
+        SUB_RUT:PUSH AX
+                INC MIN
+                CMP MIN, 59
+                JNZ N_RESET
+                MOV MIN, 30H
+                INC SEG
+                CMP SEG,60
+                JNZ N_RESET
+                MOV SEG, 30H
+                
+        N_RESET:INT 7
+                MOV AL, 0
+                OUT TIMER_5, AL
+                MOV AL, EOI_0
+                OUT EOI_0, AL
+                POP AX
+                IRET
+                
+                IRET
+                
+                ORG 2000H
+                ;CONFIGURO PIC
+                CLI
+                MOV AL, 11111101b  ;PONGO 0 EN QUE INTERRUPCION ATENDERE
+                OUT IMR_1, AL       ;PASO EL DATO A IMR
+                ;MANDO EL ID
+                MOV AL, N_CLK      ;PASO A AL EL VALOR DEL ID=10=(N_CLK)
+                OUT TIMER_5, AL    ;PONGO EN TIMER EL VALOR DE MI ID QUE PUSE EN AL
+                MOV AL, 1          ;PONGO EN AL EL VALOR A COMPARAR, 1
+                OUT COMP, AL       ;PONGO AL EN COMP
+                MOV AL, 0          ;PONGO EN AL EL VALOR DE INICIO
+                OUT CONT, AL        ;PONGO EN EL CONTADOR A AL
+                MOV BX, OFFSET SEG;ME PARO EN LA DIR DEL SEG
+                MOV AL, OFFSET FIN-OFFSET SEG;CALCULO CANTIDAD DE STRING
+                INT 7
+                STI
+
+          LOOP: JMP LOOP               
+                INT 0
+                END
