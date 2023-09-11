@@ -1,57 +1,53 @@
-            ////////////NO FUNCIONA, REVISAR///////
-            //////////SIEMPRE VA A DENEGADO///////
-            
-            ORG 1000H                          
-            MSJ  DB "INGRESE UNA CLAVE DE 4 DIGITOS: "
-            MSJ1 DB " ACCESO PERMITIDO "
-            MSJ2 DB " ACCESO DENEGADO"
-            FIN  DB 00H
-            
-            ORG 1500H                  
-            CLAVE DB "A1B2"       
-            CANT  DB 4
-            NUM   DB ?
-            
-              
-              ORG 3000H
-  
-     INGRESO:MOV BX,SP    ;TOMO DIR DE SP
-             ADD BX, 2    ;VOY A CLAVE EN LA PILA SP+2
-         SIG:MOV CL, [BX] ;PONGO EN CL A LO QUE APUNTA BX=CLAVE
-             MOV DX, BX   ;COPIA DE SEGURIDAD DE BX
-             MOV BX, OFFSET NUM ;ME PONGO EN DIR DE NUM
-             INT 6              ;INGRESO CARACTER POR TECLADO
-             CMP CL, [BX]    ;COMPARO GUARDADO Y CARACTER INGRESADO
-            
-             JNZ DENEGADO   ;SI ES DISTINTO SALTO A INCORECTO
-             MOV BX, DX     ;DEVUELVO A BX LA POSICION DONDE ESTABA
-             INC BX         ;PASO AL SIGUIENTE CARACTER
-             DEC CANT       ;DECREMENTO LA CANTIDAD(DEBE LEER 4 DIGITOS)
-             
-             JNZ INGRESO    ;SI NO ES CERO VUELVOA COMPRARA OTRO CARACTER
-             CMP CANT, 0    ;//CREO QUE ES REUNDANTE//
-             JZ PERMITIDO   ;CLAVE CORRECTA SALTO A MENSAJE 
-             
-    DENEGADO:MOV BX, OFFSET MSJ2
-             MOV AL, OFFSET FIN-OFFSET MSJ2
-             INT 7
-             JMP TERMINAR
-    
-   PERMITIDO:MOV BX, OFFSET MSJ1
-             MOV AL, OFFSET MSJ2-OFFSET MSJ1
-             INT 7
-    TERMINAR:RET
-                  
-            ORG 2000H
-            MOV DH, 4 ;FIJO CONTADOR, LLEGA A 4, FIN
-            MOV BX, OFFSET MSJ
-            MOV AL, OFFSET MSJ1 - OFFSET MSJ
-            INT 7 
-            MOV BX, OFFSET CLAVE
-            PUSH BX
+echo por la la mas mejor,Agus!!!!
 
-            CALL INGRESO   
-            POP AX
+ORG 1000H
+INGRESE     DB  "INGRESE SU CLAVE:"
+FIN         DB  10
+            ORG 1500H
+PERMITIDO   DB  "ACCESO PERMITIDO"
+            DB  10 
+DENEGADO    DB  "ACCESO DENEGADO"
+            DB  10
+CLAVE       DB  "2309"
+CLAVE_ING   DB  ?
+
+
+            ORG 2000H
+            MOV BX, OFFSET INGRESE
+            MOV AL, OFFSET FIN - OFFSET INGRESE
+            INT 7
+            MOV CL, OFFSET CLAVE_ING - OFFSET CLAVE  ;CL= cantidad de digitos de clave
+            MOV BX, OFFSET CLAVE_ING                 ;BX=dir de la clave que ingresare
             
+LEER:       INT 6     ;ingreso caracter por teclado
+            INC BX    ;siguiente dir para ingresar 2do caracter 
+            DEC CL    ;resto un caracter, me quedan tres ingresos 
+            JNZ LEER  ;si no llego a cero leeo otro, sino salto
+
+            MOV DL, 0FFH ;CLAVE CORRECTA...
+            
+            MOV CL, 4    ;seteo CL a 4= cantidad de caracteres
+            MOV BX, OFFSET CLAVE  ;BX en la dir de CLAVE
+            
+CHEQUEO:    MOV AH, [BX]  ;muevo a AH a lo que apunta BX=primer caracter de clave
+            ADD BX, 4    ; ...
+            CMP AH, [BX]  ;comparo AH(1er caracter de clave) con el 1er caracter ingresado
+            JZ LOOP      ;si es 0 leo el siguiente caracter
+            MOV DL,0     ;CLAVE INCORRECTA...
+            JMP SALTO    ;voy a salto
+            
+LOOP:       SUB BX, 3     ;resto 3 a BX...
+            DEC CL        ; decremento 1 a CL=cantidad de caracteres a ingresar
+            JNZ CHEQUEO   ;si no es cero chequeo
+
+SALTO:      CMP DL,0FFH    ;ya ingrese los 4 caracteres? 
+            JZ PERMIT      ;salto si ingrese los 4
+            MOV BX, OFFSET DENEGADO
+            MOV AL, OFFSET CLAVE - OFFSET DENEGADO
+            JMP FINAL
+PERMIT:     MOV BX, OFFSET PERMITIDO
+            MOV AL, OFFSET DENEGADO - OFFSET PERMITIDO
+FINAL:        INT 7
             INT 0
-            END
+
+END
