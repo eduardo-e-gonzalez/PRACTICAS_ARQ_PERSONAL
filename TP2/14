@@ -29,7 +29,7 @@
                 ; //////SEGUNDOS/////
                 INC SEG_D      ;INCREMENTO 1 EN MINUTOS          0:16
                 CMP SEG_D,36H  ;COMPARO PARA VER SI LLEGUE A 60  0:60?      
-                JNZ IMPRIMIR    ;SALTO A RESET
+                JNZ IMPRIMIR    ;SALTO A IMPRIMIR
                 MOV SEG_D, 30H
                 ; ///////MINUTOS///////
                 INC MIN_U      ;INCREMENTO 1 MINUTO              01:00
