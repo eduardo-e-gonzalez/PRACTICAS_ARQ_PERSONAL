@@ -1,0 +1,72 @@
+
+                ///////USAR EL DEL PUNTO 12//////
+                /////////HACERLO SOLO DE 30S/////////
+                PUNTO 14
+                CONT     EQU  10H
+                COMP     EQU  11H
+                EOI_0    EQU  20H
+                IMR_1    EQU  21H
+                ISR_2    EQU  22H
+                IRR_3    EQU  23H
+                F10_4    EQU  24H
+                TIMER_5  EQU  25H
+                N_CLK    EQU  10
+                ORG 40
+                DIR_SUB  DW SUB_RUT
+                ORG 80
+                DIR_F10  DW
+                
+                ORG 1000H
+               MIN_D  DB  30H  ;30H=0, COMIENZA EN 0 MIN 00:01
+               MIN_U  DB  30H  ;30H=0, COMIENZA EN 0 MIN 01:00
+                      DB  ":"
+               SEG_D  DB  30H  ;30H=0, COMIENZA EN 0 SEG 10
+               SEG_U  DB  30H  ;30H=0, COMIENZA EN 0 SEG 01              
+               FIN  DB  ?
+                        
+                ORG 3000H
+        SUB_RUT:PUSH AX
+                ; //////SEGUNDOS/////
+                INC SEG_D      ;INCREMENTO 1 EN MINUTOS          0:16
+                CMP SEG_D,36H  ;COMPARO PARA VER SI LLEGUE A 60  0:60?      
+                JNZ IMPRIMIR    ;SALTO A RESET
+                MOV SEG_D, 30H
+                ; ///////MINUTOS///////
+                INC MIN_U      ;INCREMENTO 1 MINUTO              01:00
+                CMP MIN_U, 3AH ;COMPARO SI SE PASO DE            010:00
+                JNZ IMPRIMIR    ;SI NO RESET
+                MOV MIN_U, 30H ;PONGO 0 EN UNIDAD DE MINUTOS     00:06
+                INC MIN_D      ;INCREMENTO 1 EN MINUTOS          10:16
+                CMP MIN_D,36H  ;COMPARO PARA VER SI LLEGUE A 60  600:00      
+                JNZ IMPRIMIR    ;SALTO A RESET
+                MOV MIN_D, 30H ;PONGO EL MINUTO UNIDAD EN 0      10:00 
+      IMPRIMIR:INT 7
+                MOV AL, 0
+                OUT TIMER_5, AL
+                MOV AL, EOI_0
+                OUT EOI_0, AL
+                POP AX
+                IRET
+                
+                ORG 2000H
+                ;CONFIGURO PIC
+                CLI
+                MOV AL, 11111101b  ;PONGO 0 EN QUE INTERRUPCION ATENDERE
+                OUT IMR_1, AL       ;PASO EL DATO A IMR
+                ;MANDO EL ID
+                MOV AL, N_CLK      ;PASO A AL EL VALOR DEL ID=10=(N_CLK)
+                OUT TIMER_5, AL    ;PONGO EN TIMER EL VALOR DE MI ID QUE PUSE EN AL
+                MOV AL, 30          ;PONGO EN AL EL VALOR A COMPARAR, 1
+                OUT COMP, AL       ;PONGO AL EN COMP
+                MOV AL, 0          ;PONGO EN AL EL VALOR DE INICIO
+                OUT CONT, AL        ;PONGO EN EL CONTADOR A AL
+                MOV BX, OFFSET MIN_D;ME PARO EN LA DIR DEL SEG
+                MOV AL, OFFSET FIN-OFFSET MIN_D;CALCULO CANTIDAD DE STRING
+                INT 7
+
+
+                STI
+
+          LOOP: JMP LOOP               
+                INT 0
+                END
