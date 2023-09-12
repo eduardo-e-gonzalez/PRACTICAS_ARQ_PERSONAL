@@ -1,4 +1,4 @@
-//////VAN ENCAMINADO PERO ...///
+//////VAN ENCAMINADO PERO corregir con lo que dijo el profe////////
                 CONT     EQU  10H
                 COMP     EQU  11H
                 EOI_0    EQU  20H
@@ -12,13 +12,13 @@
                 DIR_SUB  DW SUB_RUT
                 
                 ORG 1000H
-               SEG  DB  30H  ;30H=0, COMIENZA EN 0 SEG
-               MIN  DB  30H  ;30H=0, COMIENZA EN 0 MIN
+               SEG_D  DB  30H  ;30H=0, COMIENZA EN 0 SEG
+               SEG_U  DB  30H  ;30H=0, COMIENZA EN 0 MIN
                FIN  DB  ?
                         
                 ORG 3000H
         SUB_RUT:PUSH AX
-                INC MIN
+                INC SEG_U
                 CMP MIN, 59
                 JNZ N_RESET
                 MOV MIN, 30H
@@ -52,8 +52,17 @@
                 MOV BX, OFFSET SEG;ME PARO EN LA DIR DEL SEG
                 MOV AL, OFFSET FIN-OFFSET SEG;CALCULO CANTIDAD DE STRING
                 INT 7
+
+
                 STI
 
           LOOP: JMP LOOP               
                 INT 0
                 END
+
+
+
+A- la CPU emite un pulso cada 1seg, 
+COMP:registro de comparación que determina el módulo de la cuenta del timer.
+CONT:registro contador, muestra la cuenta de los pulsos de la señal aplicada a la entrada del periférico. 
+Cuando coincide su valor con el del registro COMP provoca una señal de salida
