@@ -1,5 +1,6 @@
-
-                
+//////////////FALTA TERMINAR////////////
+VERIFICAR Y DESCRIBIR LINEA A LINEA, NO TERMINO DE ENTENDER
+/////////                
                 CONT     EQU  10H
                 COMP     EQU  11H
                 EOI_0    EQU  20H
