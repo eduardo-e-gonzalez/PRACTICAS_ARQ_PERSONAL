@@ -12,7 +12,7 @@ VERIFICAR Y DESCRIBIR LINEA A LINEA, NO TERMINO DE ENTENDER
                 N_CLK    EQU  10
                 
                 ORG 40
-                DIR_SUB  DW SUB_RUT
+                DIR_SUB_TIMER  DW SUB_RUT
                 ORG 80
                 DIR_F10  DW  SUB_F10
                 
@@ -24,60 +24,80 @@ VERIFICAR Y DESCRIBIR LINEA A LINEA, NO TERMINO DE ENTENDER
                 ORG 3000H
         SUB_RUT:PUSH AX
                 ; //////SEGUNDOS A 30/////
-                INC SEG_D        ;  
-                CMP SEG_D, 3AH   ;  
-                JNZ IMPRIMIR     ;  
-                MOV SEG_D, 30H   ;  0:
-                INC SEG_U
-                CMP SEG_U, 33H
-                JNZ IMPRIMIR
+                INC SEG_D        ; 00:10
+                CMP SEG_D, 3AH   ; 3AH=0 00:60?
+                JNZ IMPRIMIR     ; si no es 60 imprimo
+                MOV SEG_D, 30H   ; 30H=0 00:01
+                INC SEG_U        ; 00:01
+                CMP SEG_U, 33H   ; 33H=0 00:10?
+                JNZ IMPRIMIR     ; si no es 10 imprimo
 
-                MOV DL, 1
-                MOV AL, 0FFH
+                MOV DL, 1        ;PONGO DL EN 1 PARA QUE ESPERE A QUE SE PULSE F10
+                MOV AL, 0FFH     ; 
                 OUT EOI_0,AL
                 MOV AL, 2        ;CARACETRES DEL CONTADOR
                 INT 7            ;IMPRIMO
+
                 MOV AL, 0        ;CONTADOR A CERO
                 OUT TIMER_5, AL
+                                ;avisar al PIC que se atendio la interrupcion
                 MOV AL, EOI_0
                 OUT EOI_0, AL
                 POP AX
                 IRET
                 
                 ORG 3500H
-        SUB_F10:PUSH AX        ;PUSHEO AX
-                IN AL, IMR_1   ;TOMO VALOR DEL IRM
-                XOR AL, 00000010B;XOR PARA QUE SOLO SE CAMBIE EL SEGUNDO BIT A 1
-;                                 DE ESA FORMA NO SE CAMBAIA EL BIT DEL TIMER DE ESTADO                  
-                OUT IMR_1, AL    ;
-                MOV AL, EOI_0
-                OUT EOI_0, AL
-                POP AX
+        SUB_F10:PUSH AX             ;PUSHEO AX
+                IN AL, IMR_1        ;TOMO VALOR DEL IRM
+                XOR AL, 00000010B   ;XOR PARA QUE SOLO SE CAMBIE EL SEGUNDO BIT A 1
+;                                    DE ESA FORMA NO SE CAMBAIA EL BIT DEL TIMER DE ESTADO                  
+                OUT IMR_1, AL       ; PONGO EN EL REGISTRO IMR EL VALOR DE AL
+                MOV AL, EOI_0       ;PONGO EN AL EL VALOR DE EOI_0
+                OUT EOI_0, AL       ;PONGO EN EL REGISTRO EOI_0 EL VALOR DE AL
+                POP AX              ;RECUPERO AX
                 IRET
                 
-       IMPRIMIR:INT 7
-                MOV AL, 0
-                OUT TIMER_5, AL
-                MOV AL, EOI_0
-                OUT EOI_0, AL
-                POP AX
+       IMPRIMIR:INT 7           ;IMPRIMO
+                MOV AL, 0       ;CONTADOR A CERO
+                OUT TIMER_5, AL ;PONGO EN 0 EL REGISTRO TIMER PARA QUE COMIENCE A CONTAR DESDE 0
+                MOV AL, EOI_0   ;PONGO EN AL EL VALOR DE EOI_0
+                OUT EOI_0, AL   ;PONGO EN EL REGISTRO EOI_0 EL VALOR DE AL
+                POP AX          ;RECUPERO AX
                 IRET
                 
-                ;CONFIGURO PIC
                 ORG 2000H
-                CLI
-                MOV AL, 0FDH
-                OUT IMR_1, AL ; PIC: registro IMR
+                        ;PONER EN EL VECTOR DE INT LA DIRECCION DEL F10
+
+                MOV BX, OFFSET DIR_F10  ;PONGO EN BX LA DIRECCION DE MEMORIA DE DIR_F10
+                MOV AX, SUB_F10         ;PONGO LA DIRECCION DE SUB_F10 EN AX
+                MOV [BX], AX            ;PONGO AX EN LA DIRECCION DE MEMORIA DE BX(QUE ES DIR_F10)=80H
+                      
+                        ;PONER EN EL VECTOR DE INT LA DIRECCION DE LA RUTINA DE ATENCION DEL TIMER
+
+                MOV BX, OFFSET DIR_SUB_TIMER    ;PONGO EN BX LA DIRECCION DE MEMORIA DE DIR_SUB_TIMER
+                MOV AX, SUB_RUT                 ;PONGO LA DIRECCION DE SUB_RUT EN AX
+                MOX, [BX], AX                   ;PONGO AX EN LA DIRECCION DE MEMORIA DE BX(QUE ES DIR_SUB_TIMER)=40H
+                            
+                                ;CONFIGURO PIC
+                CLI             ;DESHABILITO INTERRUPCIONES exepto la del F10 y el timer
+                MOV AL, 11111100b     ;Ponemos en 0 el bit 0 y 1 del IMR, para habilitar las interrupciones del timer y del F10                    
+                OUT IMR_1, AL         ;pongo en el registro IMR el valor de AL   
+
+                                ;MANDO LOS id de las interrupciones a los registros de los PIC
                 MOV AL, N_CLK
-                OUT CONT, AL ; PIC: registro INT1
-                MOV AL, 1
-                OUT COMP, AL ; TIMER: registro COMP
-                MOV AL, 0
-                OUT CONT, AL ; TIMER: registro CONT
-                MOV BX, OFFSET SEG_U
-                MOV DL, 0
-                STI
-          LAZO: CMP DL,0
+                OUT TIMER_5, AL
+                MOV AL, N_F10
+                OUT F10_4, AL
+                                    ;CONFIGURO TIMER para que genere una interrupcion cada 1 segundo
+                MOV AL, 1             ;pongo en 1 AL, para que el timer genere una interrupcion cada 1 segundo
+                OUT COMP, AL          ; pongo en el registro COMP el valor de AL 
+                
+                                    ;CONFIGURO TIMER para que comience a contar desde 0
+                MOV AL, 0             ;pongo en 0 el registro TIMER, para que comience a contar desde 0
+                OUT CONT, AL          ; pongo en el registro cont el valor de AL
+                STI             ;HABILITO INTERRUPCIONES
+
+          LAZO: CMP DL,0            ;COMPARO DL CON 0 PARA QUE ESPERE A QUE SE PULSE F10,
                 JMP LAZO
                 END
 
