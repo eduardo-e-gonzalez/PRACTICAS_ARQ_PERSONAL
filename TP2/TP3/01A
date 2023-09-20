@@ -1,6 +1,7 @@
 Escribir un programa que encienda las luces con el patrón 11000011, o sea, solo las primeras y las
 últimas dos luces deben prenderse, y el resto deben apagarse.
 
+
 PA_30    EQU 30H
 PB_31    EQU 31H
 CA_32    EQU 32H
@@ -8,11 +9,10 @@ CB_33    EQU 33H
 
 
 ORG 2000H
-MOV AL, 11000011    ;patron de luces de salida 1=entrada 0=salida
-OUT CA_32, AL       ;paso a CA=conf de llaves 0 TODO SALIDA
-MOV AL, 00000000b   ;todas las luces de salida 
-IN AL, PA_30        ;leo el estado de las llaves
-OUT PA_31, AL       ;paso a PA=conf de llaves 0 TODO APAGADO
+MOV AL, 00000000b   ;patron de luces de salida 1=entrada 0=salida
+OUT CB_33, AL       ;paso a CB_33=conf de llaves 0 TODO SALIDA
+MOV AL, 11000011    ;patron de como uiero que se prendan las luces 
+OUT PB_31, AL       ;paso a PA=conf de llaves 0 TODO APAGADO
 
 
 INT 0
