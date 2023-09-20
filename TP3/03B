@@ -32,5 +32,5 @@
             INT7
             JMP FIN
 
-            INT 0
+       FIN: INT0
             END
