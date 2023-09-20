@@ -1,0 +1,36 @@
+            Escribir un programa que verifique si la llave de más a la izquierda está prendida. Si es así, mostrar en
+            pantalla el mensaje “Llave prendida”, y de lo contrario mostrar “Llave apagada”. Solo importa el valor
+            de la llave de más a la izquierda (bit más significativo). Recordar que las llaves se manejan con las
+            teclas 0-7.
+
+            PA_30    EQU 30H
+            PB_31    EQU 31H
+            CA_32    EQU 32H
+            CB_33    EQU 33H
+
+            ORG 1000h
+            MSJ1 DB 'La llave esta prendida'
+            MSJ2 DB 'La llave esta apagada'
+            FIN DB ?
+            
+            ORG 20H000H
+                        /////;CONFIGURACION DE LLAVES///////
+            MOV AL, 11111111b   ;todas las llaves de entrada
+            OUT CA_32, AL       ;paso a CA=conf de llaves 1 TODO ENTRADA
+            IN AL, PA_30        ;leo el estado de las llaves
+            AND AL, 10000000b   ;me quedo con la llave de mas a la izquierda
+                        /////;COMPARO LLAVE CON LO QUE ME PIDEN///////
+            CMP AL, 0
+            JZ APAGADA
+                        /////;CONFIGURACION DE MENSAJES///////
+   PRENDIDA:MOV BX, OFFSET MSJ2
+            MOV AL, OFFSET FIN-OFFSET MSJ1
+            INT7
+            JMP FIN
+    APAGADA:MOV BX, OFFSET MSJ1
+            MOV AL, OFFSET MSJ2-OFFSET MSJ1
+            INT7
+            JMP FIN
+
+            INT 0
+            END
