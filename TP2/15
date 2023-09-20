@@ -1,4 +1,7 @@
 /////////////LA MIERDA DE VONSIM TIRA ERROR LPM/////////
+Escribir un programa que implemente un conteo regresivo a partir de un valor ingresado desde el teclado. El conteo
+debe comenzar al presionarse la tecla F10. El tiempo transcurrido debe mostrarse en pantalla, actualizándose el valor cada
+segundo.
 
                 EOI_0    EQU 20H
                 IMR_1    EQU 21H
