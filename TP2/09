@@ -1,5 +1,9 @@
 echo por la la mas mejor,Agus!!!!
 
+Escribir un programa que aguarde el ingreso de una clave de cuatro caracteres por teclado sin visualizarla en pantalla. En
+caso de coincidir con una clave predefinida (y guardada en memoria) que muestre el mensaje "Acceso permitido", caso
+contrario el mensaje "Acceso denegado".
+
 ORG 1000H
 INGRESE     DB  "INGRESE SU CLAVE:"
 FIN         DB  10
