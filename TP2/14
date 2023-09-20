@@ -1,6 +1,6 @@
-//////////////FALTA TERMINAR////////////
-VERIFICAR Y DESCRIBIR LINEA A LINEA, NO TERMINO DE ENTENDER
-/////////                
+Implementar un reloj similar al utilizado en los partidos de básquet, que arranque y detenga su marcha al presionar
+sucesivas veces la tecla F10 y que finalice el conteo al alcanzar los 30 segundos.
+
                 CONT     EQU  10H
                 COMP     EQU  11H
                 EOI_0    EQU  20H
