@@ -3,6 +3,8 @@
             de la llave de más a la izquierda (bit más significativo). Recordar que las llaves se manejan con las
             teclas 0-7.
 
+            SOLO CONFIGURAR TECLAS (CA PA)
+
             PA_30    EQU 30H
             PB_31    EQU 31H
             CA_32    EQU 32H
