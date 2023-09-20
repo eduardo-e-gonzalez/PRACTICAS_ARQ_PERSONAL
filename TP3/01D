@@ -1,0 +1,81 @@
+Escribir un programa que implemente un encendido y apagado sincronizado de las luces. Un contador,
+que inicializa en cero, se incrementa en uno una vez por segundo. Por cada incremento, se muestra a
+través de las luces, prendiendo solo aquellas luces donde el valor de las llaves es 1. Entonces, primero
+se enciende solo la luz de más a la derecha, correspondiente al patrón 00000001. Luego se continúa con
+los patrones 00000010, 00000011, y así sucesivamente. El programa termina al llegar al patrón
+11111111.
+
+EOI_0    EQU 20H
+IMR_1    EQU 21H
+TIMER_5  EQU 25H
+CONT_10  EQU 10H 
+COMP_11  EQU 11H
+PA_30    EQU 30H
+PB_31    EQU 31H
+CA_32    EQU 32H
+CB_33    EQU 33H
+ID_TIMER EQU 10
+
+    ORG 40
+      DIR_SUB_TIME DW SUB_TIMER
+
+    ORG 1000h
+      CON_BINARIO DB 00000000b
+      FIN         DB 0
+
+    ORG 3000H
+                    ////SUBRUTINA DEL TIMER/////////////////////
+      PUSH AX
+  SUB:INC CON_BINARIO
+      CMP CON_BINARIO, 0FFH   ///COMPARO SI EL CONTADOR LLEGO A 11111111 
+      JNZ LUCES               ///SI NO LLEGO A 11111111 SALTO A LUCES
+      MOV FIN, 1              ///SI LLEGO A 11111111 PONGO FIN EN 1
+
+LUCES:MOV AL, CON_BINARIO
+      OUT PB_31, AL           ///PONGO EL BALOR EN LAS LUCES 
+      MOV AL,0
+      OUT CONT_10, AL         ///PONGO EL CONTADOR EN 0   
+
+                    ////AVISO AL EOI QUE TERMINE////////////////
+      MOV AL, EOI_0
+      OUT EOI_0, AL
+      POP AX
+    
+    ORG 2000h
+    
+                    /////CONFIGURACIONDE LAS LLAVES PA Y PB CON CA_32 Y CB_33///////////
+        MOV AL, 11111111b
+        OUT PA_30, AL
+        MOV AL, 000000000b
+        OUT PB_31, AL
+        
+                     ////CONFIGURACION DEL TIMER/////////////////////
+        CLI
+        MOV AL, 11111101b       ///SELECCIONE QUE INT VOY A USAR
+        OUT IRM_1, AL           ///SELECCIONE EL TIMER 5
+        MOV AL, ID_TIMER        ///SELECCIONE EL ID DEL TIMER
+        OUT TIMER_5, AL         ///PONGO EL ID DEL TIMER
+           ////CONFIGURACION DEL CONTADOR
+        MOV AL,1                ///PONGO EL CONTADOR EN 0
+        OUT CONT_10, AL         ///PONGO 0 EN EL CONTADOR
+        MOV AL,0                ///PONGO EL COMPARADOR EN 0
+        OUT COMP_11, AL         ///PONGO 0 EN EL COMPARADOR
+        STI
+        
+TERMINE:CMP FIN, 1
+        JZ TERMINE
+
+TERMINE:INT 0
+        END
+
+
+                ////////PASOS ////////
+        
+        1- CONFIGURAR LAS LLAVES PA Y PB CON CA_32 Y CB_33
+        2- CONFIGURAR EL TIMER
+        3- CONFIGURAR EL CONTADOR
+        4- CONFIGURAR EL COMPARADOR
+        5- TERMINE CON UNA COMPARADOR EN 1
+        6- SUB_TIMER INCREMENTO 1 EN CON_BINARIO Y COMPARO SI LLEGO A 11111111, SI ES ASI PONGO FIN EN 1
+        7- HAGO ETIQUETA DE LUCES, TOMO EL VALOR DEL BIANRIO CONTADOR Y LO PONGO EN LAS LUCES
+        8- AVISO AL EOI QUE TERMINE 
