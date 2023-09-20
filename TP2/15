@@ -1,0 +1,116 @@
+/////////////LA MIERDA DE VONSIM TIRA ERROR LPM/////////
+
+                EOI_0    EQU 20H
+                IMR_1    EQU 21H
+                F10_4    EQU 24H
+                TIMER_5  EQU 25H
+                CDMA_7   EQU 27H
+                CONT_10  EQU 10H 
+                COMP_11  EQU 11H
+                ID_F10   EQU 10
+                ID_TIMER EQU 20
+
+                ORG 40H
+                DIR_SUB_F10  DW    SUB_F10 
+
+                ORG 80H
+                DIR_SUB_TIME DW    SUB_TIMER
+
+                ORG 1000H
+                ING DB "Ingrese un valor: "
+                SEG_U   DW ?
+                SEG_D   DW ?
+                FIN DB ?
+
+
+                ORG 3000H
+                ;conteo regresivo desde el valor ingresado
+                
+      SUB_TIMER:DEC SEG_D
+                CMP SEG_D, 2FH  ;el decimal es igul al anterior de 0?
+                JNZ IMPRIMIR    ;si no es igual, imprimo
+                CMP SEG_D, 39H  ;el decimal es igual a 9?
+                DEC SEG_U       ;si es igual, decremento el decimal, PASO DE 10 A 9
+                JNZ IMPRIMIR    ;si no es igual, imprimo
+                CMP SEG_U, 2FH  ;el decimal es igual al anterior de 0?
+                JNZ IMPRIMIR    ;si no es igual, imprimo
+                CMP SEG_U, 39H  ;el decimal es igual a 9?
+                JNZ IMPRIMIR    ;si no es igual, imprimo
+
+                DEC DH          ;pongo en 0 a dh para que no imprima mas
+                MOV AL, 0FFH    ;
+                OUT IMR_1, AL   ;deshabilito las interrupciones
+        IMPRIMIR:INT 7          ;imprimo el valor
+
+                        ;CONFIGURO EL TIMER PARA QUE SE INTERRUMPA CADA SEGUNDO
+                MOV AL, 1       ;cada cuanto tiempo quiero que se interrumpa
+                OUT TIMER_5, AL ;paso a TIMER_5 el valor de AL
+                MOV AL,EOI_0    ;EOI_0 = 20h
+                OUT EOI_0,AL    ;pongo 20h en EOI_0=20h
+                POP AX
+                IRET
+
+        SUB_F10:PUSH AX
+                DEC DH          ;
+                MOV AL,EOI_0    ;EOI_0 = 20h
+                OUT EOI_0, AL      ;paso a IRM el valor de AL
+                POP AX
+                IRET
+
+                ORG 2000H
+                MOV BX, OFFSET ING               ;BX = ING, inicio la cadena
+                MOV AL, OFFSET SEG_U-OFFSET ING  ;AL = FIN - ING, tamaño de la cadena
+                INT 7                             ;imprimo la cadena del primer mensaje
+                MOV BX, OFFSET SEG_U          ;inicio la cadena del segundo unidad(01) a ingresar
+                INT 6                             ;leo el valor ingresado
+                MOV BX, OFFSET SEG_D          ;inicio la cadena del segundo decimal(10) a ingresar    
+                INT 6                             ;leo el valor ingresado
+
+                ;vector de interrupcion en la dir de f10
+                MOV BX, OFFSET DIR_SUB_F10      ;DIR SUB_F10=
+                MOV AX, SUB_F10                 ;AX = SUB_F10
+                MOV [BX], AX                    ;DIR_SUB_F10 = SUB_F10
+
+                ;vector de interrupcion en la dir de TIMER
+                MOV BX, OFFSET DIR_SUB_TIME     ;DIR SUB_TIMER
+                MOV AX, SUB_TIMER               ;AX = SUB_TIMER
+                MOV [BX], AX                    ;DIR_SUB_TIMER = SUB_TIMER
+
+                CLI
+                MOV AL, 11111100b               ;habilitar interrupciones
+                OUT IMR_1, AL                   ;paso a irm el valor de AL
+
+                ;ENVIO LOS ID A LOS REGISTRO DEL PIC
+                MOV AL, ID_F10                  ;ID_F10 = 10 a AL
+                OUT F10_4, AL                   ;paso a F10_4 el valor de AL
+
+                MOV AL, ID_TIMER                ;ID_TIMER = 20 a AL
+                OUT TIMER_5 , AL                ;paso a TIMER_5 el valor de AL
+                MOV AL, 1                       ;cada cuanto tiempo quiero que se interrumpa
+                OUT COMP_11, AL                 ;paso a COMP_11 el valor de AL
+                MOV AL, 0                       ;para que el contador empiece en 0
+                OUT CONT_10, AL                 ;paso a CONT_10 el valor de AL
+
+                MOV BX, OFFSET SEG_U            ;BX = SEG_U, inicio la cadena             
+                MOV AL, OFFSET SEG_U-OFFSET FIN ;AL = SEG_U - FIN, tamaño de la cadena    
+                MOV DH, 1                       ;
+                STI
+
+        LAZO:   CMP DL, 0
+                JMP LAZO
+
+                INT 0
+                END
+
+                 ///////////PASOS////////////
+                1- Me pongo en al dir de la cadena del mensaje inicial
+                2- Imprimo la cadena pidiendo el numero a ingresar
+                3- Me pongo en la dir donde se guarda en seg decimal, pido el numero
+                4- Me pongo en la dir donde se guarda en seg unidad, pido el numero
+                5- configuro el vector de interrupcion en la dir de f10(direccion y sub y intercambio)
+                6- configuro el vector de interrupcion en la dir de TIMER (direccion y sub y intercambio)
+                7- habilito solo F10 y TIMER, deshabilito las demas interrupciones
+                8- envio los ID a los registros del PIC(ID a F10 y ID a TIMER)
+                9- configuro el timer para que se interrumpa (cada cuanto y desde que valor)
+                10- configuro el contador para que empiece en 0
+                11- me pongo en la dir de la cadena del seg unidad
