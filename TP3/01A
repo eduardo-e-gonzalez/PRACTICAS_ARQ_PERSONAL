@@ -1,6 +1,6 @@
 Escribir un programa que encienda las luces con el patrón 11000011, o sea, solo las primeras y las
 últimas dos luces deben prenderse, y el resto deben apagarse.
-
+SOLO CONFIGURAR CB PB (LUCES)
 
 PA_30    EQU 30H
 PB_31    EQU 31H
