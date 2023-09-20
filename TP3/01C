@@ -1,0 +1,28 @@
+Escribir un programa que permite encender y apagar las luces mediante las llaves. El programa no
+deberá terminar nunca, y continuamente revisar el estado de las llaves, y actualizar de forma
+consecuente el estado de las luces. La actualización se realiza simplemente prendiendo la luz i si la llave
+i correspondiente está encendida (valor 1), y apagándola en caso contrario. Por ejemplo, si solo la
+primera llave está encendida, entonces solo la primera luz se debe quedar encendida.
+
+    PA_30    EQU 30H
+    PB_31    EQU 31H
+    CA_32    EQU 32H
+    CB_33    EQU 33H
+
+        ORG 2000H
+
+        /////CONFIGURACION DE LAS LLAVES PA Y PB
+
+    MOV AL, 11111111b       ;Pongo en 1, todo ENTRADA
+    OUT CA_32, AL           ;Paso al puerto CA_32   
+    MOV AL, 00000000b
+    OUT CB_33, AL           ;Paso al puerto CB_33
+
+        ///// LEE EL ESTADO DE LAS LLAVES
+LOOP:IN AL, PA_30            ;leo el puerto PA_30
+        ////ENVIO EL ESTADO DE LAS LLAVES A LAS LUCES
+    OUT PB_31, AL           ;Paso al puerto PB_31 para prendan
+       
+    JMP LOOP
+        INT0
+        END
