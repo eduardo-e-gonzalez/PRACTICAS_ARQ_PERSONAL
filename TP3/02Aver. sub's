@@ -11,8 +11,8 @@ STROBE1
         CB_33
 
         ORG 1000H
-        LETRA_A     DB  'A'
-        FIN         DB  ?
+        MSJ      DB  'ARQUITECTURA DE COMPUTADORAS'
+        FIN      DB  ?
 
         ORG 3000H
     PIO:MOV AL, 11111101b
@@ -22,32 +22,44 @@ STROBE1
         RET
 
         ORG 3100H
-   POLL:IN AL, PA           /// LEOO EL ESTADO DE PA
+   POLL:IN AL, PA           ///LEO EL ESTADO DE PA
         AND AL, 1           ///HAGO AND 1 PARA SEPARAR SOLO EL BITE DE STROBE 
         JNZ POLL            ///SI STROBE ES 1 VUELVO A PREGUNTAR, 0 ESTA LIBRE PUEDO ENVIAR
         RET
 
         ORG 3200H
-STROBE1:MOV AL, PA_30       ///PONGO EN AL EL ESTADO DE PA
+STROBEA1:MOV AL, PA_30       ///PONGO EN AL EL ESTADO DE PA
         OR AL, 02H          ///HAGO OR 2 PARA FORZAR STROBE EN 1
         OUT PA_30, AL       ///PONGO AL EN PA_30 (PASO DE 0 A 1 STROBE)
         RET
 
         ORG 3300H
-STROBE0:MOV AL, PA_30       ///PONGO EN AL EL ESTADO DE PA
+STROBEA0:MOV AL, PA_30       ///PONGO EN AL EL ESTADO DE PA
         AND AL, 0FDH        ///HAGO AND 0FDH PARA FORZAR STROBE EN 0
         OUT PA_30, AL       ///PONGO AL EN PA_30 (PASO DE 1 A 0 STROBE)
         RET
 
         ORG 2000H
+        
         CALL PIO            ///CONF CA_32 Y CB_33 EN 1111 1101 (STROBE EN 0 Y BUSY EN 1)
 
-        MOV AL, LETRA_A     ///PONGO EN AL EL CARACTER A IMPRIMIR
-        OUT PB_31,AL
-        
-        CALL POLL           ///CONSULTO SI ESTA LIBRE PARA ENVIAR EL CARACTER
+        MOV BX, OFFSET MSJ     ///PONGO EN AL EL CARACTER A IMPRIMIR
+        MOV CL, [BX]           
+        OUT PB_31,CL    
+
+   POOLI:CALL POLL           ///CONSULTO SI ESTA LIBRE PARA ENVIAR EL CARACTER
+         
+        INC BX                 
+        CMP CL, FIN         ///COMPARO SI LLEGO AL FIN DEL MSJ
+        JZ FIN            ///SI LLEGO AL FIN DEL MSJ SALGO
+        MOV BX, OFFSET MSJ     ///PONGO EN AL EL CARACTER A IMPRIMIR
+        MOC CL, [BX]           
+        OUT PB_31,CL 
+        JMP POOLI
+       
         CALL STROBEA1       ///PONGO STROBE EN 1 PARA QUE SEPA QUE DEJE UN CARACTER
         CALL STROBEA0       ///PONGO STROBE EN 0 PARA LIBERAR LA IMPRESORA
+        JMP POOLI
 
-        INT 0
+    FIN:INT 0
         END
