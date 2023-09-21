@@ -1,1 +1,42 @@
 Escribir un programa para imprimir la letra “A” utilizando la impresora a través de la PIO
+
+        PA_30
+        PB_31
+        CA_32
+        CB_33
+
+        ORG 1000H
+        LETRA_A     DB  'A'
+        FIN         DB  ?
+
+        ORG 2000H   ///EL PRIMER FRAGMENTO VA SIEMPRE///
+        MOV AL, 11111101b           ///PONGO STROBE EN 0, BUSY EN 1
+        OUT CA_32, AL               ///PONGO AL EN CA_32
+        MOV AL, 0                   ///TODO DE SALIDA
+        OUT CB, AL                  ///PONGO AL EN CB
+
+        MOV BX, OFFSET LETRA_A      ///ME PONGO EN LA DIR DE LETRA_A PARA RECOR
+                            
+                    /////CONSULTA DE ESTADO A VER SI ESTA LIBRE
+   POLL:IN AL, PA                   ///PONGO EN AL EL ESTADO DE PA PARA SABER SI ESTA LIBRE
+        AND AL, 1                   ///HAGO AND PARA PONER 1 EN STROBE Y AVISAR QUE DEJE UN CARACTER
+        JNZ POLL                    ///SI NO ESTA LIBRE VUELVO A PREGUNTAR
+                    ////SE LIBERO LA IMPRESORA
+        MOV AL, [BX]
+        OUT PB, AL                  ///PONGO EL CARACTER EN PB
+
+                    ////PONGO STROBE EN 1 PARA QUE SEPA QUE DEJE UN CARACTER
+        IN AL, PA                   ///PONGO EN AL EL ESTADO DE PA PARA SABER SI ESTA LIBRE 
+        OR AL, 2                    ///HAGO OR 2 PARA FORZAR STROBE EN 1
+        OUT CA_32, AL               ///PONGO AL EN CA_32
+                    ////PONGO STROBE EN 0 
+        IN AL, PA                   ///PONGO EN AL EL ESTADO DE PA PARA SABER SI ESTA LIBRE
+        AND AL, 0FDH                ///HAGO AND 0FDH PARA FORZAR STROBE EN 0
+        OUT CA_32, AL               ///PONGO AL EN CA_32
+
+        INC BX                      ///INCREMENTO BX PARA PASAR AL SIGUIENTE CARACTER
+        CMP BX, OFFSET FIN          ///COMPARO BX CON FIN PARA SABER SI LLEGUE AL FINAL  
+        JNZ POLL                    ///SI NO LLEGUE AL FINAL VUELVO A PREGUNTAR
+
+        INT 0
+        END
