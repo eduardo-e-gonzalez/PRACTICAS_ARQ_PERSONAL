@@ -1,0 +1,37 @@
+        PA_30   EQU 30H
+        PB_31   EQU 31H
+        PC_32   EQU 32H
+        PD_33   EQU 33H
+
+        ORG 1000H
+        CHAR    DB 'A'
+
+        ORG 2000H
+        MOV AL, 01H         /// CONFIGURO STROBE EN 0
+        OUT CA, AL
+        MOV AL, 0           /// CONFIGURO DATOS EN 0
+        OUT CB, AL
+
+        IN AL, PA_30        ///INICIALIZO STROBE EN 1
+        AND AL, 11111101b
+        OUT PA, AL
+
+   POLL:ON AL, PB_31        ///ESPERO QUE EL BUSY ESTE EN 0, A QUE LA IMPRESORA ESTE LISTA
+        AND AL, 01H
+        JNZ POLL            ///SI ESTA EN 1, PREGUNTO HASTA QUE DE 0, ESTE LIBRE
+
+        MOV AL, CHAR        ///CARGO EL CARACTER A IMPRIMIR
+        OUT PB, AL
+
+        IN AL, PA           ///PONGO STROBE EN 0 = FRANCO ASCENDENTE
+        OR AL, 02H
+        OUT PA, AL
+
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+
+        HLT
+        END
