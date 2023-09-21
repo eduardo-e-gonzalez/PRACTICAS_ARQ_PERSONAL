@@ -8,8 +8,7 @@
         MSJ      DB  'INGRESE 5 CARACTERES:
         FIN      DB  ?
         CHAR     DB  ?
-        CANT     DB  5
-
+       
         ORG 3000H
   PEDIR:PUSH BX
         MOV BX, OFFSET CHAR
