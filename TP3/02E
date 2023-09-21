@@ -9,11 +9,11 @@ Escribir un programa para imprimir la letra “A” utilizando la impresora a tr
         LETRA_A     DB  'A'
         FIN         DB  ?
 
-        ORG 2000H   ///EL PRIMER FRAGMENTO VA SIEMPRE///
-        MOV AL, 11111101b           ///PONGO STROBE EN 0, BUSY EN 1
-        OUT CA_32, AL               ///PONGO AL EN CA_32
-        MOV AL, 0                   ///TODO DE SALIDA
-        OUT CB, AL                  ///PONGO AL EN CB
+        ORG 2000H   ///EL PRIMER FRAGMENTO VA SIEMPRE*///
+      * MOV AL, 11111101b           ///PONGO STROBE EN 0, BUSY EN 1
+      * OUT CA_32, AL               ///PONGO AL EN CA_32
+      * MOV AL, 0                   ///TODO DE SALIDA
+      * OUT CB, AL                  ///PONGO AL EN CB
 
         MOV BX, OFFSET LETRA_A      ///ME PONGO EN LA DIR DE LETRA_A PARA RECOR
                             
@@ -29,10 +29,10 @@ Escribir un programa para imprimir la letra “A” utilizando la impresora a tr
         IN AL, PA                   ///PONGO EN AL EL ESTADO DE PA PARA SABER SI ESTA LIBRE 
         OR AL, 2                    ///HAGO OR 2 PARA FORZAR STROBE EN 1
         OUT CA_32, AL               ///PONGO AL EN CA_32
-                    ////PONGO STROBE EN 0 
-        IN AL, PA                   ///PONGO EN AL EL ESTADO DE PA PARA SABER SI ESTA LIBRE
-        AND AL, 0FDH                ///HAGO AND 0FDH PARA FORZAR STROBE EN 0
-        OUT CA_32, AL               ///PONGO AL EN CA_32
+                    ////PONGO STROBE EN 0 SIEMPRE EN IMP POR PIO*
+      * IN AL, PA                   ///PONGO EN AL EL ESTADO DE PA PARA SABER SI ESTA LIBRE
+      * AND AL, 0FDH                ///HAGO AND 0FDH PARA FORZAR STROBE EN 0
+      * OUT CA_32, AL               ///PONGO AL EN CA_32
 
         INC BX                      ///INCREMENTO BX PARA PASAR AL SIGUIENTE CARACTER
         CMP BX, OFFSET FIN          ///COMPARO BX CON FIN PARA SABER SI LLEGUE AL FINAL  
