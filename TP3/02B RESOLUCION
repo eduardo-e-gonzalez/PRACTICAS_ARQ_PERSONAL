@@ -1,0 +1,47 @@
+        PIO EQU 30H
+        
+        ORG 1000H
+        MSJ DB "ORGANIZACIÓN Y "   ////ES COMO SI ESCRIBIERA TODO JUNTO PERO EN MEMORIA ES LO MISMO
+        DB "ARQUITECTURA DE "
+        DB "COMPUTADORAS"
+        FIN DB ?
+
+        ORG 2000H
+    ; INICIALIZACION PIO PARA IMPRESORA
+    ; CA
+        MOV AL, 0FDH
+        OUT PIO+2, AL
+    ; CB
+        MOV AL, 0
+        OUT PIO+3, AL
+    ; Strobe
+        IN AL, PIO
+        AND AL, 0FDH
+        OUT PIO, AL
+
+    ; FIN INICIALIZACION
+        MOV BX, OFFSET MSJ
+        MOV CL, OFFSET FIN - OFFSET MSJ
+  POLL: IN AL, PIO
+        AND AL, 1
+        JNZ POLL
+
+    ; Enviar carácter
+        MOV AL, [BX]
+        OUT PIO+1, AL
+
+    ; Pulso STROBE A 1
+        IN AL, PIO
+        OR AL, 02H
+        OUT PIO, AL
+    ; Reiniciar STROBE A 0
+        IN AL, PIO
+        AND AL, 0FDH
+        OUT PIO, AL
+
+        INC BX ; Mover el puntero de la cadena
+        DEC CL
+        JNZ POLL ; Verificar fin de la cadena
+        
+        INT 0
+        END
