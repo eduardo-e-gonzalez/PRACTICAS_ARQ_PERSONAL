@@ -1,88 +1,83 @@
+            Escribir un programa que solicita el ingreso de cinco caracteres por teclado y los envía de a uno por
+      vez a la impresora a través de la PIO a medida que se van ingresando. No es necesario mostrar los
+      caracteres en la pantalla.
+            
+            
+            PA_30
+            PB_31
+            CA_32
+            CB_33
 
-        PA_30
-        PB_31
-        CA_32
-        CB_33
-
-        ORG 1000H
-        MSJ      DB  'INGRESE 5 CARACTERES:
-        FIN      DB  ?
-        CHAR     DB  ?
-       
-        ORG 3000H
-  PEDIR:PUSH BX
-        MOV BX, OFFSET CHAR
-        MOV CL,[BX]
-        INT 6
-        POP BX
-        RET
-  A_IMP:PUSH BX
-        PUSH AX
-        MOV BX, OFFSET MSJ     ///ME PONGO EN LA DIR DEL CHAR
-        MOV AL, [BX]           ///TOMO EL CHAR
-        OUT PB_31,CL           ///LO MANDO A LA IMPRESORA
-        POP AX
-        POP BX
-        RET   
-       
-
-        
-    PIO:MOV AL, 11111101b
-        OUT CA_32, AL
-        MOV AL,0
-        OUT CB_33, AL
-        RET
-
-        ORG 3100H
-   POLL:IN AL, PA           ///LEO EL ESTADO DE PA
-        AND AL, 1           ///HAGO AND 1 PARA SEPARAR SOLO EL BITE DE STROBE 
-        JNZ POLL            ///SI STROBE ES 1 VUELVO A PREGUNTAR, 0 ESTA LIBRE PUEDO ENVIAR
-        RET
-
-        ORG 3200H
-STROBEA1:MOV AL, PA_30       ///PONGO EN AL EL ESTADO DE PA
-        OR AL, 02H          ///HAGO OR 2 PARA FORZAR STROBE EN 1
-        OUT PA_30, AL       ///PONGO AL EN PA_30 (PASO DE 0 A 1 STROBE)
-        RET
-
-        ORG 3300H
-STROBEA0:MOV AL, PA_30       ///PONGO EN AL EL ESTADO DE PA
-        AND AL, 0FDH        ///HAGO AND 0FDH PARA FORZAR STROBE EN 0
-        OUT PA_30, AL       ///PONGO AL EN PA_30 (PASO DE 1 A 0 STROBE)
-        RET
-
-        ORG 2000H
-        CALL PIO            ///CONF CA_32 Y CB_33 EN 1111 1101 (STROBE EN 0 Y BUSY EN 1)
-
-        PUSH BX
-        MOV BX, OFFSET MSJ     ///ME PONGO EN LA DIR DEL MENSAJE DE INGRESO
-        MOV AL, OFFSET MSJ- OFFSET FIN
-        INT 7
-        MOV CH, 5
-        POP BX
-  POOLI:CALL POLL           ///CONSULTO SI ESTA LIBRE PARA ENVIAR EL CARACTER
-        CALL PEDIR          ///PIDO EL CARACTER
-        CALL STROBEA1       ///PONGO STROBE EN 1 PARA QUE SEPA QUE DEJE UN CARACTER
-        CALL STROBEA0       ///PONGO STROBE EN 0 PARA LIBERAR LA IMPRESORA
-        DEC CH              ///DECREMENTO LOS 5 CHAR   
-        CMP CH, 0           ///COMPARO YA INGRESE 5 CARACTERES
-        JZ FIN              ///SI YA INGRESE 5 SALGO
-        INC BX              ///SIGUIENTE CARACTER
-        MOV CL, [BX]           
-        OUT PB_31,CL 
-        JMP POOLI
-    FIN:INT 0
-        END
+            ORG 1000H
+            MSJ      DB  "INGRESE 5 CARACTERES:"
+            CHAR     DB  ?
 
 
-        ////////////////PASOS QUE HICE//////////////////
+      A_IMP:PUSH BX
+            PUSH AX
+            MOV BX, OFFSET MSJ     ///ME PONGO EN LA DIR DEL CHAR
+            MOV AL, [BX]           ///TOMO EL CHAR
+            OUT PB_31,CL           ///LO MANDO A LA IMPRESORA
+            POP AX
+            POP BX
+            RET   
+            
 
-        1- CONFIGURO PIO
-        2- DAOY MENSAJE DE INGRESO
-        3- POLL PARA CONSULTA DE ESTADO DE LA IMPRESORA
-        4- STROBE A 1
-        5- STROBE A 0
-        6- DECREMENTO CANTIDAD DE INGRESOS (5)
-        7- COMPARO SI YA INGRESE 5 CARACTERES SALTO A FIN O PASO AL SIGUIENTE CARACTER
-        8- MANDO EL CARACTER A LA IMPRESORA
-        9- VUELVO A POLL PARA CONSULTAR SI ESTA LIBRE LA IMPRESORA O TERMINE DE IMPRIMIR
+            
+      PIO:MOV AL, 11111101b
+            OUT CA_32, AL
+            MOV AL,0
+            OUT CB_33, AL
+            RET
+
+            ORG 3100H
+      POLL:IN AL, PA           ///LEO EL ESTADO DE PA
+            AND AL, 1           ///HAGO AND 1 PARA SEPARAR SOLO EL BITE DE STROBE 
+            JNZ POLL            ///SI STROBE ES 1 VUELVO A PREGUNTAR, 0 ESTA LIBRE PUEDO ENVIAR
+            RET
+
+            ORG 3200H
+   STROBEA1:MOV AL, PA_30       ///PONGO EN AL EL ESTADO DE PA
+            OR AL, 02H          ///HAGO OR 2 PARA FORZAR STROBE EN 1
+            OUT PA_30, AL       ///PONGO AL EN PA_30 (PASO DE 0 A 1 STROBE)
+            RET
+
+            ORG 3300H
+   STROBEA0:MOV AL, PA_30       ///PONGO EN AL EL ESTADO DE PA
+            AND AL, 0FDH        ///HAGO AND 0FDH PARA FORZAR STROBE EN 0
+            OUT PA_30, AL       ///PONGO AL EN PA_30 (PASO DE 1 A 0 STROBE)
+            RET
+
+            ORG 2000H
+            CALL PIO                                ///CONF CA_32 Y CB_33 EN 1111 1101 (STROBE EN 0 Y BUSY EN 1)
+            MOV BX, OFFSET MSJ                      ///ME PONGO EN LA DIR DEL MENSAJE DE INGRESO
+            MOV AL, OFFSET CHAR- OFFSET MSJ         ///CALCULO LA DISTANCIA ENTRE EL MSJ Y EL CHAR
+            INT 7                                   ///IMPRIMIR EL MSJ
+            MOV CH, 5                               ///CANTIDAD DE CARACTERES A INGRESAR
+            MOV BX, OFFSET CHAR                     
+
+      LEER:INT 6
+            DEC CH              ///DECREMENTO LOS 5 CHAR   
+            CMP CH, 0           ///COMPARO YA INGRESE 5 CARACTERES
+            JZ FINLEER          ///SI YA INGRESE 5 SALGO
+            INC BX              ///SIGUIENTE CARACTER
+            JMP LEER            ///VUELVO A LEER
+FINLEER:MOV BX, OFFSET CHAR     ///ME PONGO EN LA DIR DEL CHAR(AL PRINCIPIO)
+            MOV CH, 5           ///CANTIDAD DE CARACTERES A INGRESAR
+            
+      POOLI:CALL POLL           ///CONSULTO SI ESTA LIBRE PARA ENVIAR EL CARACTER
+            MOV AL, [BX]        ///TOMO EL CARACTER
+            OUT PB_31, AL       ///LO MANDO A LA IMPRESORA
+            CALL STROBEA1       ///PONGO STROBE EN 1 PARA QUE SEPA QUE DEJE UN CARACTER
+            CALL STROBEA0       ///PONGO STROBE EN 0 PARA LIBERAR LA IMPRESORA
+            INC BX
+            DEC  CH
+            JNZ POOLI
+
+        FIN:INT 0
+            END
+
+
+            ////////////////PASOS QUE HICE//////////////////
+
+            
