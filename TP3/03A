@@ -52,3 +52,8 @@ encuentra con el ejercicio 2b?
             
             INT 0
             END
+
+LA DIFERENCIA ES QUE EN HS la CPU inicia la operación de E/S y luego consulta periódicamente (polling) 
+un registro de estado o señal de estado para verificar si el dispositivo periférico ha completado la operación.
+La CPU sigue funcionando y puede realizar otras tareas mientras espera que se complete la E/S.
+en cambio por PIO no se libera hasta terminar
