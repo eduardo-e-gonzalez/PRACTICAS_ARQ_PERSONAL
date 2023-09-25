@@ -1,0 +1,19 @@
+¿Cuál es la ventaja en utilizar el HAND-SHAKE con respecto al PIO para comunicarse con la
+impresora? Sacando eso de lado, ¿Qué ventajas tiene el PIO, en general, con respecto al HANDSHAKE?
+
+Impresión por PIO (Programmed I/O):
+
+En PIO, la CPU controla directamente la transferencia de datos entre el registro de E/S (puerto de E/S) y la memoria.
+La CPU inicia la operación de E/S y espera hasta que el dispositivo periférico haya completado la transferencia de datos antes de continuar la ejecución.
+Es una técnica simple y directa, pero puede ser ineficiente ya que la CPU debe esperar activamente y no puede hacer nada más mientras espera que se complete la E/S.
+Impresión por Handshake con Polling:
+
+En el método de "handshake" con "polling", la CPU inicia la operación de E/S y luego consulta periódicamente (polling) un registro de estado o señal de estado 
+para verificar si el dispositivo periférico ha completado la operación.
+La CPU sigue funcionando y puede realizar otras tareas mientras espera que se complete la E/S.
+Cuando el registro de estado indica que la E/S ha finalizado, la CPU puede recuperar los datos.
+La principal diferencia entre estos dos métodos es cómo la CPU maneja el tiempo de espera durante la E/S. 
+En el caso del PIO, la CPU espera de manera activa, lo que puede desperdiciar recursos de la CPU. 
+En el caso del "handshake" con "polling", la CPU puede realizar otras tareas mientras espera que se complete la E/S, 
+lo que puede hacer que el uso de recursos sea más eficiente.
+El PIO es una opción simple y directa para la E/S en sistemas más simples o en situaciones donde se requiere un control preciso. 
