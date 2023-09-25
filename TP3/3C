@@ -1,0 +1,51 @@
+Escribir un programa que imprime “UNIVERSIDAD NACIONAL DE LA PLATA” en la impresora a
+través del HAND-SHAKE. La comunicación se establece por interrupciones emitidas desde el HANDSHAKE
+cada vez que la impresora se desocupa.
+
+        EOI_0      EQU     20H
+        IMR_1      EQU     21H
+        INT0_F10   EQU     24H
+        INT1_TIMER EQU     25H
+        INT2_HS    EQU     26H
+
+        DATO        EQU     30H
+        ESTADO      EQU     31H
+        ID_HS       EQU     10
+
+        ORG 40
+        DIR_POLLING  DW SUB_HS      ;Direccion de la rutina 
+
+        ORG 1000H
+        MSJ    DB "UNIVERSIDAD NACIONAL DE LA PLATA"
+        FIN    DB  ?
+
+        ORG 3000H
+ SUB_HS:PUSH AX
+        MOV AL, [BX]        ;me Pongo en el caracter
+        OUT DATO, AL        ;lo mando al puerto de datos
+        INC BX              ;paso al siguiente caracter
+        DEC CL              ;decremento el contador
+        JNZ TERMINO         ;si no termino vuelvo a la interrupcion
+
+        MOV AL, IMR_1       ;Habilito interrupciones
+        OUT IMR_1, AL
+
+TERMINO:MOV AL, EOI_0       ;Envio EOI que termine la interrupcion
+        OUT EOI_0, AL
+        POP AX              ;Restauro AX
+        IRET
+
+        ORG 2000H
+        PUSH BX
+        MOV AL, 11111011b               ;Habilito interrupciones
+        OUT IMR_1, AL                   ;en lo mando al PIC
+        IN AL, ESTADO                   ;Leo el estado del HS
+        AND AL, 07FH                    ;Me quedo con el 7 bits
+        MOV BX, OFFSET MSJ              ;Pongo el offset del mensaje en BX
+        MOV CL, OFFSET FIN - OFFSET MSJ ;Pongo el contador en CL
+        STI
+        
+   LOOP:CMP CL, 0                       ;Si el contador es 0
+        JMP  LOOP                       ;vuelvo a esperar
+        INT 0
+        END
