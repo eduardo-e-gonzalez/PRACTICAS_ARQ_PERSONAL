@@ -1,0 +1,54 @@
+            Escribir un programa que imprime “INGENIERIA E INFORMATICA” en la impresora a través del
+HAND-SHAKE. La comunicación se establece por consulta de estado (polling). ¿Qué diferencias
+encuentra con el ejercicio 2b?
+///////////NO LO PUDE PROBAR///////////
+
+            EOI_0       EQU 30H
+            IRM_1       EQU 31H
+            INT0_F10    EQU 34
+            INT1_TIMER0 EQU 35H
+            HANDSHAKE   EQU 36H
+            
+            ESTADO      EQU 40H
+            DATO        EQU 41H
+            ID_HS       EQU 20
+            
+            ORG 80 
+            DIR_POLLING DW ID_HS
+
+            ORG 1000H
+            MSJ DB "INGENIERIA E INFORMATICA"
+            FIN DB ?
+
+            ORG 3000H
+        IMP:PUSH BX                       ;//guardo el valor de BX
+            MOV AL,[BX]                   ;//paso el valor de BX a AL
+            OUT DATO, AL                  ;//paso el valor de AL a DATO
+            INC BX                        ;//incremento BX, paso a la siguiente caracter
+            DEC CL                        ;//decremento CL, que es la cantidad de caracteres
+            JNZ IMP                       ;//si CL es distinto de 0, salto a IMP
+            MOV AL, 11111111b             ;//deshabilito HANDSHAKE
+            OUT IRM_1, AL                 ;//paso el valor a IRM
+   VOLVEMOS:MOV AL, EOI_0                 ;//aviso que termine
+            OUT EOI_0, AL
+            POP BX                        ;//recupero el valor de BX
+            IRET
+            
+            ORG 2000H
+            CLI
+            MOV AL, 11111011b             ;//habilito HANDSHAKE
+            OUT IRM_1, AL                 ;//paso el valor a IRM
+            MOV AL, ID_HS     
+            OUT HANDSHAKE, AL             ;//Pongo la direccion de memoria del polling en el HANDSHAKE
+            IN AL, ESTADO                 ;//leo el estado
+            OR AL, 80H                    ;//habilito el bit 7
+            OUT ESTADO, AL                ;//paso el valor a ESTADO
+            MOV BX, OFFSET MSJ            ;//paso la direccion de memoria del mensaje a BX
+            MOV CL, OFFSET FIN-OFFSET MSJ ;//paso la cantidad de caracteres a CL
+            STI
+       
+       LOOP:CMP CL,0
+            JMP LOOP
+            
+            INT 0
+            END
