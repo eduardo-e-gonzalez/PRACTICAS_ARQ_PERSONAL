@@ -1,0 +1,116 @@
+1. Complete los valores que quedaran guardados en la pila luego de la ejecucion del siguientes
+fragmento del programa. 
+
+FRAGMENTO...
+
+ORG 1500H
+DATX DB 0A2H  
+DATY DB 1BH
+
+ORG 2000H
+MOV AX,OFFSET DATX //QUEDEA EN LA PILA COMO: AH: 01h AL:15
+MOV CX,OFFSET DATY  //QUEDEA EN LA PILA COMO: BH: H BL: 001BH
+PUSH CX
+PUSH AX
+
+7FFBh   |       |
+7FFCh   |   00  |
+7FFDh   |   15  |
+7FFEh   |   01h |
+7FFFh   |   15  |
+8000h   |       |
+
+2. Explique la diferencia entre las instrucciones RET y IRET.
+
+    RET se utiliza para retornar de una subrutina, 
+    mientras que IRET se utiliza para retornar de una interrupcion. 
+
+3. Cuales son los registros USART?
+
+    Los registros USART son:
+    - RHR: Registro de recepcion de datos.
+    - THR: Registro de transmision de datos.
+    - IER: Registro de habilitacion de interrupciones.
+    - IIR: Registro de identificacion de interrupciones.
+    
+
+4.Con que herramienta se realiza la compilacion de un programa escrito para el emulador MSX88?
+    
+    Se realiza con HM88.
+
+5. Explique porque los registros IMR e ISR del PIC pueden tener simutaneamente los valores IMR=FDh e ISR=02h?
+
+    Porque el registro IMR es el que habilita las interrupciones, y el ISR es el que identifica las interrupciones, 
+    por lo tanto, si el IMR tiene el valor FDh, significa que la interrupcion 1 esta habilitada, y la interrupcion 0 no, 
+    y si el ISR tiene el valor 02h, significa que la interrupcion 1 esta activa, y la interrupcion 0 no.
+
+6.Si PUERTO es una constante que vale 41h y el registro AL tiene almacenado el valor 80h,
+¿que efecto produce la interrupcion OUT PUERTO, AL?
+
+    La interrupcion PUT PUERTO, AL, produce que el valor 80h se almacene en el puerto 41h.
+
+7. Escribalas instrucciones necesarias para configurar el PIO con el objetivo de imprimir a travez de la impresora Centronic.
+
+        Las instrucciones son:
+        MOV AL, 11111101b
+        OUT 40H, AL
+        MOV AL, 00000000b
+        OUT 41H, AL
+
+8. Cuantas interrupciones se pueden asignar dentro del vector de interrupciones y cuales estan pre asugnadas?
+
+    Se pueden almacenar 256 interrupciones, y las preasignadas:
+        INT0:F10
+        INT1:TIMER
+        INT2:HANDSHAEK
+        INT3:CDMA
+    
+9. Indicar la diferencia funcional de utilizar la impresora por HANDSHAEK o por PIO.
+
+    La diferencia es que por HANDSHAEK, la impresora se configura para trabajar por consulta de estado, 
+    y por PIO, la impresora se configura para trabajar por interrupcion.
+
+ejersicios extras
+
+El siguiente programa envia a la impresora una serie de caracteres que son ingresados
+por el usuario desde el teclado. La impresora se configura para trabajar por consulta de
+estado. Los datos se envian a la impresora una Vez que el usuario presiona la tecla ENTER
+(código ODH) o al alcanzarse el número måximo de 25 caracteres ingresados, Completar el
+programa con las instrucciones faltantes para que funcione correctamente. 
+
+        HAND EQU 40H
+        ORG 1000H
+        MSJ DB "INGRESA TEXTO"
+        MAX DB 25
+        CAR DB ?
+
+        ORG 2000H
+        MOV BX, OFFSET
+        MOV AL, OFFSET MAX-OFFSET MSJ       ;AL Cantidadd de caracteres a imprimir
+        INT 7                               ;Imprime el mensaje
+        MOV AH, MAX                         ;AH Cantidad de caracteres a ingresar
+        MOV BX, OFFSET CAR                  ;BX Puntero al buffer de caracteres
+  INGRE:INT 6                               ;Lee un caracter desded teclado
+        CMP BYTE PTR [BX], 0DH              ;Si es ENTER
+        _______________ JNZ SEGUIR          ;Si no es enter Salta a SEGUIR
+        INC BX                              ;Incrementa el puntero a la siguiente posicion
+        DEC AH                              ;Decrementa el contador de caracteres a ingresar
+        JNZ INGRE                           ;Si no se han ingresado 25 caracteres, vuelve a leer
+ SEGUIR:IN AL, HAND+1                       ;lee el Estado de la impresora
+        AND AL, 7FH                         ;Enmascara el bit 7=01111111
+        OUT HAND+1, AL                      ;Envia el estado a la impresora
+        ___________________ JNZ INGRE       ;Si la impresora no esta lista, vuelve a leer
+        MOV CL, MAX
+        SUB CL, AH
+    POLL:________   IN AL, HAND+1
+        AND AL, 1
+        JNZ POLL
+        MV AL, [BX]
+        OUT HAND, AL
+        INC BX
+        LOOP POLL
+        INT 0
+        END
+
+¿Que modificacion haria que introducir al programa para limitar 
+a 15 el numero de caracteres a ingresar e imprimir, en lugar de 25?
