@@ -1,0 +1,109 @@
+ 1. Que posibles instrucciones deben ir e las lineas 10 y 12 
+ del programa para enviar la variable oso por valor a la subrutina POTENCIA?
+    a-Si su DNI termina en digito IMPAR, utilizar pasaje por registro.
+    b-Si su DNI termina en digito PAR, utilizar pasaje por pila.
+
+    org 3000H
+    POTENCIA:...
+    ...
+    RET
+    org 2000H
+    .........
+    .........
+    CALL POTENCIA
+    .........
+    .........
+    INT 0
+    END
+
+b- VIA PILA
+ORG 1000H
+oso:    DB15
+
+ORG 3000H
+potencia... /// no se llena
+ret
+
+ORG 2000H
+........mov bx,OFFSET oso ///a completar linea 10
+........push bx           ///a completar linea 11
+CALL potencia
+........pop bx            ///a completar linea 12
+int 0
+END
+
+a- VIA PILAREGISTRO
+ORG 1000H
+oso:    DB15
+
+ORG 3000H
+potencia... /// no se llena
+ret
+
+ORG 2000H
+.........PUSH AX    ///a completar linea 10
+.........mov ax, 15 ///a completar linea 11
+call potencia
+..........pop AX            ///a completar linea 12
+int 0
+END
+
+
+2.Se debe responder a una interrupción del TIMER (solo el TIMER). Se usará el indice o
+identiffcador de interrupción (también conocido como posición del vector de
+interupciones) 7. iQué registras del PIC deben modificarse para configurarlo y qué valores
+se le deben asiguar?
+
+SE DEBE MODIFICAR EL REGISTRO IMR 21H PARA HABILITAR LA INTERRUPCION DEL TIMER, CON EL VALOR 11111101
+Y EL SE DEBE ASIGNAR modificarse
+MOV AL, 11111101        NO SE PORQUE ALGUNOS PONEN 7 EN VEZ DEL BINARIO
+OUT 25H, AL
+
+3. Si el regsto CONT vale 10, el registra COMP vale 11, y el programa no cambia estos registros con un OUT
+¿habra un pedido de interrupción del timer? Si es asi, cuando se solicitara?
+
+se solicitara en el segundo siguiente cuando el CONT llegue a 11.
+
+4. Escribir un programa para MSX88 que encienda el led de la posicion X y luego termine; el resto debe quedar apagado
+X en este caso es el ultimo digito de tu DNI, si esta entre 0 y 7 inclusive. Si el ultimo digito de tu DNI
+encender cl 1. Nota Los leds tienen posiciones de 0 al 7, de derecha a izquierda (76543210)
+
+mi DNI termina en 6, por lo tanto se encendera el led 6
+
+org 2000H           
+mov al, 0           ; todos los leds de salida 0
+out 33h, al         ; se envia al puerto de salida CB_33
+or al, 01000000     ; se enciende el led 6
+out 31h, al         ; se envia al puerto de salida PB_31 
+int 0               ; se termina el programa
+end
+
+5. El siguiente programa verifica el estado de las llaves Si están prendidas las llaves 2 y
+mostrar en pantalla el mensaje 'ACTIVADO"; de lo contrario no se debe mostrar nada
+que el programa se ejecute correctamente
+
+    PIO EQU 30H
+    ORG 1000H
+    MASJ DB 'ACTIVADO´
+    FIN DB ?
+
+    ORG 2000H
+    _______________MOV AL, 11111111b
+    OUT PIO+2, AL
+    IN AL, PIO
+    _______________CMP AL, 11111101
+    JNZ FIN
+    MOV BX, OFFSET MSJ1
+    _______________mov al, OFFSET fin- OFFSET MSJ
+    INT 7
+FIN:HLT
+    END
+
+6. Escriba Un programa que dada una cadena de caracteres almacenada en la memonia, imprima atraves de la impresora
+solamente sus curacteres сuyo codigo ASCI sea PAR en al orden en que aparecen 
+Para ello, debera implementar y utlizar una subrutina SELECCIONADO que reciba un caracter como parametro
+y devuelva verdadero(1) si el el codigo del caracter es par y falso (0) de lo contano 
+Por ejemnplo A no seria seleccionada porque su codigo ASCII es 65 (impar). 
+Por otro lado, la Z si seria seleccionado porque su codigo ASCII es 90 (par).
+ El programa debe esperar a que se hayan enviado todos los caracteres a imprimir para fnalizar.
+
