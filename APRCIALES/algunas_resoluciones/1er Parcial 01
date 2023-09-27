@@ -1,0 +1,131 @@
+PRIMER PARCIAL
+
+1.  Explique de forma breve en que consiste el pasaje de parametros por valor a una subrutina.
+        
+        //El pasaje por parametros por valor consiste en pasar el valor directamente a la subrutina, es decir, 
+        //se pasa el valor de la variable y no la direccion de memoria de la misma.
+
+2.  Indique que interrupocion del PIC estan conectadas con la tecla F10 y el HandShake en el simulador MSX88?
+
+        //La interrupcion que esta conectada aon la tecla F10 es laINT0 y con HANDSHAEK la INT2.
+
+3.  Como haria para pasar la direccion de la etiqueta TABLA a travez de la pila a una subrutina?
+
+        //MOV AX, OFFSET TABLA
+        //PUSH AX
+
+4.  Complete las instrucciones para generar el pulso del STROBE e imprimir a travez de la impresora el caracter que esta en BX?
+        PIO EQU 30H
+        ...(No se completa)                        
+        POLL: IN AL, PIO        
+        AND AL, 1
+        JNZ POLL
+
+        MOV AL, [BX]                        //pongo en AL el caracter que esta en BX
+        OUT ....., AL  //out PIO+1, AL      //pongo el caracter en el puerto PB_31 (PIO+1)
+        
+        IN AL, PIO                          //leo el estado del puerto
+        OR AL, .....    //or al, 02h        //pongo en 1 el bit 1(STROBE) del registro AL
+        OUT ....., AL   //out PIO, AL       //pongo el registro AL en el puerto PIO(PA_30)
+        IN AL, PIO
+        AND AL,.....    //and al, 11111101  //pongo en 0 el bit 1(STROBE) del registro AL
+        OUT PIO, AL
+
+5.  Indique con una X cual de las siguientes instrucciones son correctas y cual incorrectas?
+
+    instrucciones           | correcta | incorrecta
+    ------------------------|----------|-----------
+    INC valor               |     X    |            //se puede incrementar el valor de una variable
+    POP CL                  |          |     X      //no se puede hacer pop a un registro de 8 bits
+    MOV AX, OFFSET TABLA    |     X    |            //se puede mover la direccion de una etiqueta a un registro
+    MOV [BX], 10            |          |     X      //no se puede mover un valor a una direccion de memoria
+
+6.  Explicar brevemente que guarda cada registro.
+    IMR.....................///IMR guarda la mascara de interrupcion
+    IRR.....................///IRR guarda el registro de peticiones de interrupcion, que interrupcion esta pendiente
+
+7.  Explique que modo de operacion tiene el HANDSHAEK y en que se diferencian.
+
+    //El modo de operacion del HANDSHAEK es por interrupcion, es decir, cuando el HANDSHAEK esta en 1, 
+    //el PIC genera una interrupcion, y cuando esta en 0, no genera interrupcion.
+    //La diferencia entre el HANDSHAEK y la INT=0 es que el HANDSHAEK es por interrupcion y la INT=0 es por polling.
+     
+8.  Explique el funcionamiento y los registros involucrdos en la interrupcion por software INT7.
+
+        //La interrupcion por software INT7 tiene el funcionmiento de imprimir un caracter por pantalla.
+        //el registro BX que contiene la direccion de memoria del string a imprimir
+        //Los registros involucrados son el registro AL, que es el que contiene el caracter a imprimir,
+     
+
+9. Escribe un programa para MSX88 que cada 20 segundos pida el ingreso por teclado de un caracterer.
+   El dato leido(tamaño byte) se interpreta como un entero sin signo.
+   Si dicho dato es menor que 100, el programa debe enviar inmediatamente un 1
+   a travez de la linea 0 del puerto PB, y ceros a travez de las lineas restantes.
+   Si es mayor que 150 debe enviar 1 por la linea 1 del puerto PB y ceros por las demas,
+   La temporizacion de la lectura debe implementarse mediante la interrupcion del TIMER.
+   El analisis de los datos ingresados y la posterior escritura debe realizarse en una subrutina,
+   que recibe el dato a analizar pr valor a travez de registro. 
+
+            PIC
+            EOI_0      EQU 20H
+            IMR_1      EQU 21H
+            INT0_F10   EQU 24H
+            INT1_TIMER EQU 25H
+            TIMER
+            CONT_10    EQU 10H
+            COMP_11    EQU 11H
+            ID
+            ID_TIMER   EQU 10
+            
+            ORG 80
+            DIR_SUB_TIMER DW SUB_TIMER
+
+            ORG 1000H
+            MSJ1    DB  'Ingrese un caracter: '
+            CHAR    DB  ?
+            FIN     DB  ?
+
+            ORG 3000H
+   ANALIZAR:CMP AL, 100     //AL es el registro que contiene el caracter a analizar
+            JS MENOR_100    //si es menor a 100 salta a MENOR_100
+            CMP AL, 150     //COMPARA AL con 150
+            JNS MAYOR_150   //salta a MAYOR_150
+            MOV AL, 1       //si no es menor a 100 ni mayor a 150, pone en AL un 1
+            OUT PB, AL      //pone en el puerto PB el valor de AL
+            RET
+  MENOR_100:MOV AL, 1       //pone en AL un 00000001b
+            OUT PB_31, AL   //pone en el puerto PB el valor de AL|
+            RET
+  MAYOR_150:MOV AL, 2       //pone en AL un 00000010b
+            OUT PB_30, AL   //pone en el puerto PB el valor de AL
+            RET
+  SUB_TIMER:MOV AL, EOI_0
+            OUT EOI_0, AL
+     PEDIDO:MOV BX, OFFSET MSJ1
+            MOV AL, OFFSET CHAR-OFFSET MSJ1
+            INT 7   
+            MOV BX, CHAR
+            INT 6
+            CALL ANALIZAR
+           
+
+            ORG 2000H
+            PUSH AX
+            CLI
+            MOV AL, 11111101b
+            OUT IMR_1, AL
+            MOV AL, ID_TIMER
+            OUT TIMER_5, AL
+            MOV AL, 10
+            OUT CONT_10, AL
+            MOV AL, 0
+            OUT COMP_10, AL
+            STI
+
+            CALL PEDIDO
+            JMP PEDIDO
+            POP AX
+
+            INT 0
+            END
+
