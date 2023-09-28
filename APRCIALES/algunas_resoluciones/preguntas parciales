@@ -5,9 +5,10 @@ AX  DB 5
 BX  DB 1
 
 ORG 2000H
-ADD AX, BX
-SUB BX, AX
-SUB AX, BX
+push AX
+push BX
+pop AX
+pop BX
 INT 0
 END
 
