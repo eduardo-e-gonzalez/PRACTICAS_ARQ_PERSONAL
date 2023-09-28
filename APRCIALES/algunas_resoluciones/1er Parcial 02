@@ -107,3 +107,57 @@ Por ejemnplo A no seria seleccionada porque su codigo ASCII es 65 (impar).
 Por otro lado, la Z si seria seleccionado porque su codigo ASCII es 90 (par).
  El programa debe esperar a que se hayan enviado todos los caracteres a imprimir para fnalizar.
 
+            
+            EOI EQU 20H
+            PA  EQU 30H
+            PB  EQU 31H
+            CA  EQU 32H
+            CB  EQU 33H
+
+            ORG 1000H
+            CADENA    DB "ZA"
+            FIN       DB ?
+            CADANA_OK DB ?
+
+            ORG 3000h
+   SELECCIONADO:
+                MOV AL, [BX]                ;//PONGO EN AL EL PRIMER CARACTER
+                AND AL, 1                   ;//VEO SI ES PAR O IMPAR
+                JNZ IMPAR                   ;//SI ES IMPAR, SALTO A IMPAR
+                RET
+                
+                RET
+        IMPAR:  MOV AL, 0
+                RET
+
+                       
+                ORG 2000H
+                MOV BX, OFFSET CADENA       ;//PONGO EN BX LA DIRECCION DE LA CADENA
+                MOV CL, OFFSET FIN - OFFSET CADENA
+                CALL SELECCIONADO       ;//LLAMO A LA SUBRUTINA
+                
+                MOV AL, 11111101b           ;//MASCARA PARA PONER EN 0 EL BIT 1
+                OUT CA, AL                  ;//PONGO EN 0 EL BIT 1
+                MOV AL, 0                   ;//MANDO O= SALIDA A CB
+                OUT CB, AL                  ;//MANDO 0 A CB
+
+           POLL:IN AL, PA                   ;//LEO SI ESTA LISTO PARA ENVIAR
+                AND AL, PA                  ;//MASCARA PARA SABE SI ESTA EN 0, LIBRE
+                JNZ POLL                    ;//SI ESTA EN 1, OCUPADO, ESPERO
+
+                MOV AL, [BX] 
+                OUT PB, AL                  ;//ENVIO UN 1 PARA QUE IMPRIMA
+
+                IN AL, PA
+                OR AL,02H
+                OUT PA, AL
+                IN AL, PA
+                AND AL, 0FH
+                OUT PA, AL
+                
+                INC BX  
+                DEC CL                  ;//INCREMENTO EL PUNTERO
+                CMP CL, 0               ;//COMPARO SI ES EL FIN DE LA CADENA
+                JNZ SELECCIONADO        ;//SI NO ES EL FIN, VUELVO A LLAMAR A LA SUBRUTINA
+                HLT
+                END
