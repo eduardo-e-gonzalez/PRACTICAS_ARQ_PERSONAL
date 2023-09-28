@@ -43,6 +43,6 @@ NO USAR STROBE
             ORG 2000H
             MOV BX, OFFSET CADENA   ;PONE EN BX LA DIRECCIÓN DE LA CADENA
             MOV CL,5                ;PONE EN CL EL VALOR 5, QUE ES EL NUMERO DE CARACTERES QUE SE DEBEN RECIBIR
-            CALL 
+             
             INT 0
             END
