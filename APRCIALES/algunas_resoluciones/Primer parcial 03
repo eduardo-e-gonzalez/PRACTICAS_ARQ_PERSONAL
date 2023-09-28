@@ -114,3 +114,5 @@ programa con las instrucciones faltantes para que funcione correctamente.
 
 ¿Que modificacion haria que introducir al programa para limitar 
 a 15 el numero de caracteres a ingresar e imprimir, en lugar de 25?
+
+        Modificaria la linea MAX DB 25, por MAX DB 15.
