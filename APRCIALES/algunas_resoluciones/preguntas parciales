@@ -1,0 +1,18 @@
+como se hace para intercamniar valores de los registros ax y bx sin utilizar registros? ejem sis ax es 1 y bx 5 tiene que qdar bx 1 y ax 5
+
+
+
+si en el pic del msx88 el registro IMR= CBH q se indica?
+
+
+
+
+si el registro sp = 7ff9h antes de completarse una instruccion iret que valor tendra sp una vez completada la iret?
+
+
+
+
+q diferencia hay entre el iret y ret?
+
+
+
