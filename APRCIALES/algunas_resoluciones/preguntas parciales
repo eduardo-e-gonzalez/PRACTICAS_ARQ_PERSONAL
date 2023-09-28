@@ -1,6 +1,15 @@
 como se hace para intercamniar valores de los registros ax y bx sin utilizar registros? ejem sis ax es 1 y bx 5 tiene que qdar bx 1 y ax 5
 
+ORG 1000H
+AX  DB 5
+BX  DB 1
 
+ORG 2000H
+ADD AX, BX
+SUB BX, AX
+SUB AX, BX
+INT 0
+END
 
 si en el pic del msx88 el registro IMR= CBH q se indica?
 
