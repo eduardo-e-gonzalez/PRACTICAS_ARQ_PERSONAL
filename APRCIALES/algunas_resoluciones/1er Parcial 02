@@ -161,3 +161,42 @@ Por otro lado, la Z si seria seleccionado porque su codigo ASCII es 90 (par).
                 JNZ SELECCIONADO        ;//SI NO ES EL FIN, VUELVO A LLAMAR A LA SUBRUTINA
                 HLT
                 END
+
+///////////////////////POR CONSULTA DE ESTADO////////////////////////////////
+         
+        
+            HAN_DATO   EQU 40H
+            HAN_ESTADO  EQU 41H
+
+            ORG 1000H
+            CADENA    DB "ZA"
+            FIN       DB ?
+
+            ORG 3000h
+   SELECCIONADO:MOV AL, [BX]                ;//PONGO EN AL EL PRIMER CARACTER
+                AND AL, 1     
+                JNZ IMPAR
+                MOV DL, 1
+          IMPAR:MOV AL,0                   ;//SI ES IMPAR, SALTO A IMPAR
+                RET
+                
+                
+
+                       
+                ORG 2000H
+                IN AL, HAN_ESTADO
+                AND AL, 01111111b
+                OUT HAN_ESTADO, AL
+                
+                MOV BX, OFFSET CADENA             ;//PONGO EN BX LA DIRECCION DE LA CADENA
+           POLL:CALL SELECCIONADO                 ;//LLAMO A LA SUBRUTINA     
+                CMP DL,1
+                JNZ POLL
+                MOV AL, [BX]
+                OUT HAN_ESTADO, AL
+               
+                INC BX  
+                CMP BX, OFFSET FIN
+                JNZ POLL    
+                INT 0
+                END
