@@ -1,1 +1,9 @@
+A- dadd r1, r2,r0           ; r1 = r2 + r0, suma de dos registros
+B- daddi r3, r0, 5          ; r3 = 5 + r0, suma de un inmediato y de un registro
+C- dsub r4, r4, r4          ; r4 = r4 - r4, resta de dos registros
+D- daddi r5, r5, -1         ; r5 = -1 + r5, suma de un inmediato y de un registro
+E- xori r6, r6, 0xFFFF      ; r6 = r6 XOR 0xFFFF, XOR de un registro y de un inmediato
 
+DADD sirve para sumar dos registros.
+DADDI para sumar un registro y un inmediato.
+DSUB para restar dos registros y xori para hacer un XOR entre un registro y un inmediato.
