@@ -1,0 +1,130 @@
+
+Analiza el siguiente programa con el simulador MIPS64:
+
+    .data
+A: .word 1
+B: .word 3
+    .code
+ld r1, A(r0)
+ld r2, B(r0)
+loop: dsll r1, r1, 1
+daddi r2, r2, -1
+bnez r2, loop
+halt
+
+a) Ejecutar el programa con Forwarding habilitado y responder:
+- ¿Por qué se presentan atascos tipo RAW?
+    
+    Se presentan atascos war porque se intenta leer un dato que todavia no esta disponible, 
+    aun asi utilizando forwarding ya que el dato se encuentra en el registro de salida de la ALU, 
+    pero aun no esta disponible para ser leido.
+
+- Branch Taken es otro tipo de atasco que aparece. ¿Qué significa?
+    
+    Branch taken es un atasco que se produce cuando se realiza un salto condicional.
+    Por ejemplo: bnez r2, loop, si r2 es distinto de cero, se salta a la etiqueta loop.
+    En este caso, se produce un atasco porque el salto condicional se realiza en la etapa de ejecucion
+    y como el salto es tomado, se debe vaciar el pipeline y volver a cargar las instrucciones. 
+    
+-¿Por qué se produce?
+
+    Esto se produce porque el salto condicional se realiza en la etapa de ejecucion, y el pipeline
+    no puede saber si el salto es tomado o no hasta que se llega a la etapa de ejecucion.
+    Por lo tanto, si el salto es tomado, se debe vaciar el pipeline y volver a cargar las instrucciones.
+
+- ¿Cuántos CPI tiene la ejecución de este programa? Tomar nota del número de ciclos, cantidad de instrucciones y CPI.
+
+    El programa tiene 10 instrucciones, 10 ciclos y un CPI de 1.
+    Se dan de la siguiente manera: 
+    1 ciclo para la instruccion ld r1, A(r0)
+    1 ciclo para la instruccion ld r2, B(r0)
+    1 ciclo para la instruccion dsll r1, r1, 1
+    1 ciclo para la instruccion daddi r2, r2, -1
+    1 ciclo para la instruccion bnez r2, loop
+    1 ciclo para la instruccion halt
+    1 ciclo para la instruccion ld r1, A(r0)
+    1 ciclo para la instruccion ld r2, B(r0)
+    1 ciclo para la instruccion dsll r1, r1, 1
+    1 ciclo para la instruccion daddi r2, r2, -1
+
+b) Ejecutar ahora el programa deshabilitando el Forwarding y responder:
+- ¿Qué instrucciones generan los atascos tipo RAW y por qué? ¿En qué etapa del cauce se produce el atasco en cada caso y
+durante cuántos ciclos?
+
+    Las instrucciones que generan atascos tipo RAW son las siguientes:
+    - dsll r1, r1, 1 y daddi r2, r2, -1 generan un atasco en la etapa de ejecucion durante 1 ciclo
+    ya que intentan leer un dato que todavia no esta disponible; r1 y r2 respectivamente.
+    - bnez r2, loop genera un atasco en la etapa de ejecucion durante 1 ciclo
+    ya que intenta leer un dato que todavia no esta disponible; r2.
+
+- Los Branch Taken Stalls se siguen generando. ¿Qué cantidad de ciclos dura este atasco en cada vuelta del lazo loop?
+
+    En cada vuelta del lazo loop, el atasco dura 3 ciclos ya que se debe vaciar el pipeline y volver a cargar las instrucciones.
+    ciclo 1: se vacia el pipeline
+    ciclo 2: se vuelve a cargar la instruccion bnez r2, loop
+    ciclo 3: se vuelve a cargar la instruccion halt
+
+Comparar con la ejecución con Forwarding y explicar la diferencia.
+- ¿Cuántos CPI tiene la ejecución del programa en este caso? Comparar número de ciclos, cantidad de instrucciones y CPI
+con el caso con Forwarding.
+
+    Con forwarding, el programa tiene 10 instrucciones, 10 ciclos y un CPI de 1.
+    Con forwarding deshabilitado, el programa tiene 10 instrucciones, 19 ciclos y un CPI de 1.9.
+    los 19 ciclos se dan por el siguiente motivo: 
+    Al no usar forwarding, se generan atascos tipo RAW y Branch Taken Stalls.
+    
+
+c) Reordenar las instrucciones para que la cantidad de RAW sea '0' en la ejecución del programa (Forwarding habilitado)
+
+original
+            .data
+        A: .word 1
+        B: .word 3
+            .code
+        ld r1, A(r0)        ;cargo r1 con el valor de A;                                r1=1
+        ld r2, B(r0)        ;cargo r2 con el valor de B                                 r2=3
+
+  loop: dsll r1, r1, 1      ;dsll hace un corrimiento a la izquierda de r1; r1 = r1 * 2 r1=2(1*2)
+        daddi r2, r2, -1    ;daddi suma -1 a r2 y lo guarda en r2                       r2=2(3-1)
+        bnez r2, loop       ;si r2 es distinto de cero, salta a la etiqueta loop;       r2=2, como es distinto de cero, salta a loop 
+        
+        halt                bnez=branch not equal zero=si no es cero, es como jnz       
+reordenado
+            .data
+        A: .word 1
+        B: .word 3
+            .code
+        ld r1, A(r0)
+        ld r2, B(r0)
+  
+  loop: daddi r2, r2, -1    ;daddi suma -1 a r2 y lo guarda en r2                       r2=2(3-1) esta instruccion se alterno con...
+        dsll r1, r1, 1      ;dsll hace un corrimiento a la izquierda de r1; r1 = r1 * 2 r1=2(1*2) ...esta instruccion
+        bnez r2, loop       ;si r2 es distinto de cero, salta a la etiqueta loop;       r2=2, como es distinto de cero, salta a loop
+  
+        halt
+
+d) Modificar el programa para que almacene en un arreglo en memoria de datos los contenidos parciales del registro r1 ¿Qué
+significado tienen los elementos de la tabla que se genera?
+
+    .data
+a: .word 1
+b: .word 3
+c: .word 0                                      ;inicializo c en 0
+    .code
+ld r1, a(r0)                                    ;r1=1
+ld r2, b(r0)                                    ;r2=3
+loop: dsll r1, r1, 1                            ;r1=2   (1*2), r1=4   (2*2), r1=8   (4*2)
+daddi r2, r2, -1                                ;r2=2   (3-1)  r2=1   (2-1)  r2=0   (1-1)
+bnez r2, loop                                   ;r2=2, como es distinto de cero, salta a loop   (salta 3 veces)
+sd r1, c(r0)                                    ;guardo el contenido de r1 en c     
+halt
+
+    El significado de los elementos de la tabla que se genera es el siguiente: 
+        
+        se muestra cómo evolucionan los valores de r1 en cada iteración del bucle:
+        Antes del bucle: r1 = 1
+        Primera iteración: r1 = 1 * 2 = 2
+        Segunda iteración: r1 = 2 * 2 = 4
+        Tercera iteración: r1 = 4 * 2 = 8
+        Por lo tanto, los elementos de la tabla ge
+
