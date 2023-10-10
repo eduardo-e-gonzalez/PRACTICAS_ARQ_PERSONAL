@@ -5,9 +5,9 @@ A:  word 1
 B:  word 2
 
     .code       ;Declaracion de codigo, es como org 2000h
-ld r1, A(r0)    ;Carga el valor de A en r1      <-------
-ld r2, B(r0)    ;Carga el valor de B en r2      <-------
-sd r2, A(r0)    ;Guarda el valor de r2 en dir A -------> 
+ld r1, A(r0)    ;Carga el valor de A en r1      r1 <---carga---- A+0
+ld r2, B(r0)    ;Carga el valor de B en r2      r2 <---carga---- B+0
+sd r2, A(r0)    ;Guarda el valor de r2 en dir A r2 ----carga---> A+0 
 halt            ;Fin del programa
 
 LD: CARGA EL VALOR DE LA DIRECCION DE MEMORIA EN EL REGISTRO,   <DESTINO>, <VARIABLE> (DESPLAZAMIENTO), 
