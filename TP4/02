@@ -1,1 +1,41 @@
-ERHET
+INTERCAMBIO DE VALORES
+
+    .data       ;Declaracion de datos, es como org 1000h
+A:  word 1
+B:  word 2
+
+    .code       ;Declaracion de codigo, es como org 2000h
+ld r1, A(r0)    ;Carga el valor de A en r1      <-------
+ld r2, B(r0)    ;Carga el valor de B en r2      <-------
+sd r2, A(r0)    ;Guarda el valor de r2 en dir A -------> 
+halt            ;Fin del programa
+
+LD: CARGA EL VALOR DE LA DIRECCION DE MEMORIA EN EL REGISTRO,   <DESTINO>, <VARIABLE> (DESPLAZAMIENTO), 
+    eje: ld r1, A(r0) ;Carga el valor de A en r1
+SD; GUARDA EL VALOR DEL REGISTRO EN LA DIRECCION DE MEMORIA, SD <REGISTRO ORIGEN>, <VARIABLE> (DESPLAZAMIENTO), 
+    eje: sd r2, A(r0) ;Guarda el valor de r2 en dir A
+
+a) Ejecutarlo en el simulador con la opción Configure/Enable Forwarding deshabilitada. Analizar paso a paso su
+funcionamiento, examinar las distintas ventanas que se muestran en el simulador y responder:
+
+- ¿Qué instrucción está generando atascos (stalls) en el cauce (ó pipeline) y por qué?
+
+    la instrucción SD R2, A(R0) genera un atasco en el cauce, ya que el valor de R2 
+    no se encuentra disponible en el registro hasta el ciclo 4, por lo que se debe esperar
+    hasta el ciclo 5 para poder ejecutar la instrucción.
+
+- ¿Qué tipo de „stall‟ es el que aparece?
+
+    El tipo de atasco que aparece es un atasco estructural, ya que la instrucción SD R2, A(R0)
+    no puede utilizar el recurso de memoria 
+
+- ¿Cuál es el promedio de Ciclos Por Instrucción (CPI) en la ejecución de este programa bajo esta configuración?
+
+    El promedio de CPI es de 2.5 ciclos por instrucción y lo obtenemos de la siguiente manera:
+    1 + 1 + 1 + 1 + 5 = 9, donde; 
+    
+    1 es el ciclo de instrucción de LD R1, A(R0)
+    1 es el ciclo de instrucción de LD R2, B(R0)
+    1 es el ciclo de instrucción de SD R2, A(R0)
+    1 es el ciclo de instrucción de HALT
+    5 es el ciclo de instrucción de SD R2, A(R0) que es el que genera el atasco
