@@ -1,4 +1,22 @@
- Dado el siguiente programa:
+////////////////////////////////////////////////////////
+
+CON CAUSE SEGMENTADO
+1 ATASCO = 1 CICLO DE PENALIZACION
+
+CPI = CICLO O INSTRUCCIONES=(1+4)/1
+    EJEMPLO: 5 INSTRUCCIONES
+    "CPI=(5+4)/5" --->  9/5= 1.8 
+
+CON CAUSE SEGMENTADO Y ATASCOS (A)
+    CPI=CICLOS O INSTRUCCIONES=(1+4+A)/1
+    EJEMPLO: 5 INSTRUCCIONES, 2 ATASCOS
+    "CPI=(5+4+2)/5" --->  11/5= 2.2
+
+    PEDIR EXPLICACION DE ESTO
+                         
+////////////////////////////////////////////////////////
+
+Dado el siguiente programa:
 
 .data
 tabla: .word 20, 1, 14, 3, 2, 58, 18, 7, 12, 11
