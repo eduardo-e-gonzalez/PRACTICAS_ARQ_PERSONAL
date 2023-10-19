@@ -24,7 +24,7 @@ funcionamiento, examinar las distintas ventanas que se muestran en el simulador 
     no se encuentra disponible en el registro hasta el ciclo 4, por lo que se debe esperar
     hasta el ciclo 5 para poder ejecutar la instrucción.
 
-- ¿Qué tipo de „stall‟ es el que aparece?
+- ¿Qué tipo de „stall‟ es el que aparece? stall=atasco
 
     El tipo de atasco que aparece es un atasco estructural, ya que la instrucción SD R2, A(R0)
     no puede utilizar el recurso de memoria 
