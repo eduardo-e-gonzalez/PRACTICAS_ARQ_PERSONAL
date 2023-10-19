@@ -1,0 +1,48 @@
+ Dado el siguiente programa:
+
+.data
+tabla: .word 20, 1, 14, 3, 2, 58, 18, 7, 12, 11
+num: .word 7
+long: .word 10
+
+.code
+ld r1, long(r0)             ; r1 = 10
+ld r2, num(r0)              ; r2 = 7
+dadd r3, r0, r0             ; suma 0 a 0 y guarda en r3
+dadd r10, r0, r0            ; suma 0 a 0 y guarda en r10
+loop: ld r4, tabla(r3)      ; loop, carga en r4 el valor de la tabla en la posición 0 de la tabla, 20
+beq r4, r2, listo           ; si r4 es igual a r2, salta a listo
+daddi r1, r1, -1            ; r1 contiene 10, le resta 1, queda 9. es el contador de la tabla
+daddi r3, r3, 8             ; r3 contiene 0, le suma 8, quedando en la siguiente posición de la tabla
+bnez r1, loop               ; si r1 es distinto de 0, salta a loop
+j fin                       ; salta a fin
+listo: daddi r10, r0, 1     ; sumo 1 a r0 y lo pongo en r10. seria un flog indicando que se encontrio el numero
+fin: halt                   ; fin del programa
+
+a) Ejecutar en simulador con Forwarding habilitado. ¿Qué tarea realiza? ¿Cuál es el resultado y dónde queda indicado?
+
+    en una tabla de 10 elementos, busca el numero 7. si lo encuentra, pone un flag en 1, sino termina el programa.
+
+b) Re-Ejecutar el programa con la opción Configure/Enable Branch Target Buffer habilitada. Explicar la ventaja de usar este
+método y cómo trabaja.
+    
+        la ventaja es que se ahorra ciclos de clock, ya que no se tiene que esperar a que se resuelva el branch para saber si se
+        tiene que saltar o no. el branch target buffer es una tabla que guarda la dirección de memoria a la que se tiene que saltar
+        en caso de que se cumpla la condición del branch. si se cumple, se salta a esa dirección, sino se sigue ejecutando el programa
+        normalmente. 
+
+c) Confeccionar una tabla que compare número de ciclos, CPI, RAWs y Branch Taken Stalls para los dos casos anteriores.
+se reañiza de la siguiente manera:  
+                                    Ciclos = instrucciones * CPI
+                                    CPI = ciclos / instrucciones(10)
+                                    RAWs = cantidad de veces que se produce un RAW(0)
+                                    Branch Taken Stalls = cantidad de veces que se produce un branch taken stall (0)
+
+Habilitando la opción Branch Target Buffer (BTB) logramos reducir los atascos Branch Taken stalls a la mitad.
+Tener en cuenta que esta opción es útil cuando aumenta la cantidad de iteraciones de un lazo. Como vemos
+también esta opción no actúa sobre los atascos por dependencia de datos (RAW en este caso) que no se
+modifican.
+    |   | ciclos | CPI   | RAWs | Branch Taken Stalls |
+    |---|--------|-------|------|---------------------|
+    | a |  71    | 1.651 |  0   |          0          |
+    | b |  67    | 1.558 |  0   |          0          |
