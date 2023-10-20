@@ -1,0 +1,59 @@
+5) El siguiente programa multiplica por 2 los elementos de un arreglo llamado datos y genera un nuevo arreglo llamado res.
+Ejecutar el programa en el simulador winmips64 con la opción Delay Slot habilitada.
+
+.data
+cant: .word 8
+datos: .word 1, 2, 3, 4, 5, 6, 7, 8
+res: .word 0
+
+.code
+dadd r1, r0, r0
+ld r2, cant(r0)
+loop: ld r3, datos(r1)
+daddi r2, r2, -1
+dsll r3, r3, 1
+sd r3, res(r1)
+daddi r1, r1, 8
+bnez r2, loop
+nop
+halt
+
+a) ¿Qué efecto tiene habilitar la opción Delay Slot (salto retardado)?.
+
+    El efecto que tiene es que se ejecuta la instrucción que se encuentra en la siguiente posición de memori
+    a la que se encuentra la instrucción de salto, antes de saltar a la dirección de memoria indicada por la instrucción de salto.
+
+b) ¿Con qué fin se incluye la instrucción NOP? ¿Qué sucedería si no estuviera?.
+
+    Se incluye para que la instrucción de salto no se ejecute en el ciclo en el que se ejecuta la instrucción 
+    que se encuentra en la posición de memoria siguiente a la instrucción de salto.
+    Si no estuviera, la instrucción de salto se ejecutaría en el mismo ciclo en el que se ejecuta la instrucción 
+    que se encuentra en la posición de memoria siguiente a la instrucción de salto.
+
+c) Tomar nota de la cantidad de ciclos, la cantidad de instrucciones y los CPI luego de ejecutar el programa.
+
+    88 ciclos, 59 instrucciones, 1.492 CPI, 25 atascos RAW
+
+d) Modificar el programa para aprovechar el „Delay Slot‟ ejecutando una instrucción útil. Simular y comparar número de
+ciclos, instrucciones y CPI obtenidos con los de la versión anterior.
+
+dentro del loop esta la instruccion:
+    daddi r1, r1, 8         ; sumamos 8 a r1(se usa para pasar de posición) (r1 = 8)
+que podemos dejarla fuera sin modificar el programa quedando:
+
+    .data
+cant: .word 8
+datos: .word 1, 2, 3, 4, 5, 6, 7, 8
+res: .word 0
+
+.code
+dadd r1, r0, r0
+ld r2, cant(r0)
+loop: ld r3, datos(r1)
+daddi r2, r2, -1
+dsll r3, r3, 1
+sd r3, res(r1)  <------------------linea en viejo lugar
+bnez r2, loop
+daddi r1, r1, 8 <------------------linea en nuevo lugar
+nop
+halt
