@@ -9,19 +9,27 @@ C       .WORD   2
 res     .WORD   0    ;resultado
 
 .code
-        ld r1, A            ;r1 = A
-        ld r2, B            ;r2 = B
-        ld r3, C            ;r3 = C
-        ld r4, 3            ;r4 = contador
-        ld r5, res          ;r5 = resultado
-        
-        beq r1, r2, iguales ;si A = B, salta a iguales
-        beq r1, r3, iguales ;si A = C, salta a iguales
-        beq r2, r3, iguales ;si B = C, salta a iguales
-        j termne            ;si no son iguales, salta a termne
-iguales:daddi r5,r4, 1       ;si son iguales, res=r5 +1
-        jr R31               ;vuelvo donde estaba
-        
- termne:daddi r5, r5, 1     ;sumo uno al total(debe dar 0, 2 o 3)
-        sd r5, res          ;guardo el resultado en res
-        HALT
+               0 ld r1, A            ;r1 = A
+               1 ld r2, B            ;r2 = B
+               2 ld r3, C            ;r3 = C
+                ld r4, res          ;r5 = resultado
+                
+                beq r1, r2, 2iguales            ;si A = B, salta a 2iguales
+                bne r1, r2, byc                 ;si A <> B, salta a byc   
+                                
+son_iguales_ab: beq r2, r3, todos_iguales       ;si A = B y B = C, salta a todos_iguales
+                bne r2, r3, dos_iguales         ;si A = B y B <> C, salta a dos_iguales
+
+compara_b_y_c:  beq r1, r3, dos_iguales         ;si A <> B y B = C, salta a dos_iguales
+                bne r1, r3, ninguno_iguales     ;si A <> B y B <> C, salta a ninguno_iguales
+
+todos_iguales:  ld r4, 3                        ;cargo 3 en r4
+                sd r4, Resultado                ;guardo r4 en Resultado
+
+dos_iguales:    ld r4, 2                        ;cargo 2 en r4
+                sd r4, Resultado                ;guardo r4 en Resultado
+
+ninguno_iguales:ld r4, 0                        ;cargo 0 en r4
+                sd r4, Resultado                ;guardo r4 en Resultado
+
+        fin:    halt                            ;fin del programa
