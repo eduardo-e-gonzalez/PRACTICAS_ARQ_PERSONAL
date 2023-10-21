@@ -1,0 +1,22 @@
+8   Escribir un programa que multiplique dos números enteros utilizando sumas repetidas (similar a Ejercicio 6 o 7 de la Práctica
+    El programa debe estar optimizado para su ejecución con la opción Delay Slot habilitada.
+
+    .data
+    num1   .word   5    ;multiplicando
+    num2   .word   3    ;multiplicador
+    res   .word   0     ;resultado
+
+    .code
+    ld r1, num1
+    ld r2, num2
+    ld r3, res
+
+    ;//sumas repetitivas; r1 + r1, dec r2//
+
+    daddi r3, r0,r0             ;inicializo el resultado en 0
+    loop:   dadd r3, r3, r1     ;sumo r1 a r3. 0+5=5, segundo loop 5+5=10, tercer loop 10+5=15
+            daddi r2, r2, -1    ;decremento r2 en 1. 3-1=2
+            bnez loop           ;si r2 <> 0, salto a loop.
+    nop                         ;delay slot, al leer la siguiente instruccion, esto sera un nop
+    sd res, r3
+    halt
