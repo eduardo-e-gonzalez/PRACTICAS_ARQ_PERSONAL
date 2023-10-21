@@ -1,0 +1,50 @@
+7) * Escribir un programa que recorra una TABLA de diez números enteros y determine cuántos elementos son mayores que X.
+El resultado debe almacenarse en una dirección etiquetada CANT. El programa debe generar además otro arreglo llamado RES
+cuyos elementos sean ceros y unos. Un „1‟ indicará que el entero correspondiente en el arreglo TABLA es mayor que X,
+mientras que un „0‟ indicará que es menor o igual.
+
+ayuda:Definir en la zona de memoria de datos una tabla (TABLA) con 10 números enteros, a continuación un arreglo
+(RES) donde se cargaran 1s o 0s según los números definidos en tabla sean “mayor” o ”menor o igual” que un
+número (X) que en memoria a continuación del arreglo RES. También definiremos en memoria una variable LONG
+que valdrá 10 y otra CANT inicializada en 0. Todas estas variables serán de tamaño word. Faltaría definir una
+máscara para detectar si el número verificado es mayor o menor, para este fin utilizaremos la 0x8000 como MASK
+que también definiremos en memoria (con una operación AND logramos este cometido).
+Recordar que se debe contabilizar la cantidad de números que son mayores que el número “x” y guardar ese
+resultado en la variable en memoria CANT.
+
+.data
+TABLA:  .word 1,2,3,4,5,6,7,8,9,10
+X:      .word 5
+CANT:   .word 0
+long:   .word 10
+MASK:   .word 0x8000 
+RES:    .word 0,0,0,0,0,0,0,0,0,0
+
+.code 
+        ld r1, MASK     ;sirve para comparar SI E SMAYOR O MENOR
+        ld r2, X        ;sirve para comparar con X
+        ld r3, long     ;sirve para recorrer el arreglo LONG
+        ld r4, TABLA    ;sirve para recorrer el arreglo TABLA
+        ld r5, CANT     ;sirve para contar los mayores que X
+        ld r6, RES      ;sirve para recorrer el arreglo RES
+        ;
+         r7, 0        ;sirve para comparar si es mayor o menor
+        dadd r6, r0, r0     ;inicializo r6 en 0 luego sumo de a 8 para recorrer el arreglo
+        
+loop:   ld r4, tabla(r6)    ;cargo en r4 el valor de la tabla en la posicion r6=0
+        and r7, r4, r1      ;comparo si es mayor o menor guardando en r7
+        beq mayor           ;si es mayor salto a ES_MAYOR
+        ld r6, RES(0)       ;si es menor cargo en r8 el valor de RES en la posicion r6=0
+        dadd r6, r0, 8      ;sumo de a 8 para recorrer el arreglo
+        dadd r3, r3, -1     ;resto 1 a la cantidad de elementos a recorrer
+        bne loop            ;si no termino vuelvo a loop
+        J fin               ;si termino salto a fin
+
+es_mayor:sd r8, RES(1)      ;guardo en RES en la posicion r6=0 el valor 1: es mayor
+        dadd r6, r0, 8      ;sumo de a 8 para recorrer el arreglo
+        dadd r5, r5, 1      ;sumo 1 a la cantidad de mayores que X
+        dadd r3, r3, -1     ;resto 1 a la cantidad de elementos a recorrer
+        bne loop            ;si no termino vuelvo a loop
+    fin:halt
+
+
