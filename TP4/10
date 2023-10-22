@@ -1,0 +1,39 @@
+10) Escribir un programa que cuente la cantidad de veces que un determinado caracter aparece en una cadena de texto. 
+Observar cómo se almacenan en memoria los códigos ASCII de los caracteres (código de la letra “a” es 61H).
+Utilizar la instrucción lbu(load byte unsigned) para cargar códigos en registros. 
+La inicialización de los datos es la siguiente:
+
+
+cómo se almacenan en memoria los códigos ASCII de los caracteres?
+    los codigos ASCII se almacenan en memoria en formato hexadecimal, es decir, en base 16. Es decir,
+    el codigo ASCII de la letra "a" es 61H, el de la "b" es 62H, el de la "c" es 63H, y asi sucesivamente.
+    para poder buscar un caracter en una cadena de texto, debemos saber el codigo ASCII del caracter que buscamos,
+    por eso en vez de usar.word, usamos .asciiz, que nos permite almacenar caracteres en memoria.
+.data
+cadena: .asciiz "adbdcdedfdgdhdid" ; cadena a analizar
+car: .asciiz "d"    ; caracter buscado
+cant: .word 0       ; cantidad de veces que se repite el caracter car en cadena.
+total: .word 16     ; total de caracteres en cadena. Lo agregue para poder saber cuando es el final de la cadena.
+
+.code
+ld r1, car      ; r1 = car a buscar
+ld r2, cadena   ; r2 = cadena de texto
+ld r3, cant     ; r3 = cant de veces que se repite car en cadena
+ld r4, total    ; r4 = total de string de la cadena
+
+        daddi r3, r3, 0  ; cant = 0 inializo
+loop:   lbu r5, 0(r2)       //r5 = caracter de cadena. 0(r2) = primer caracter de cadena
+        beq r5, r1, total   //si r5 = r1, entonces total
+        daddi r2, r2, 1     //avanzo en cadena
+        daddi r4, r4, -1    //resto 1 en total
+        bne r4, 0, fin      //si total es 0, termino
+        j loop              //sino, vuelvo a loop
+
+total:  daddi r4, r4, -1    //resto 1 en total
+        daddi r2, r2, 1     //avanzo en cadena
+        daddi r3, r3, 1     //sumo 1 en cant
+        bne r4, 0, fin      //si total es 0, termino
+        j loop              //sino, vuelvo a loop
+
+sd r3, cant     //cant = r3
+    fin:halt
