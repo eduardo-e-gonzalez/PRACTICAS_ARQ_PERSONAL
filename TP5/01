@@ -1,0 +1,53 @@
+1) Simular el siguiente programa de suma de números en punto flotante y analizar minuciosamente la ejecución paso a
+paso. Inhabilitar Delay Slot y mantener habilitado Forwarding.
+
+.data
+n1: .double 9.13
+n2: .double 6.58
+res1: .double 0.0
+res2: .double 0.0
+
+.code
+(1) l.d f1, n1(r0)      //carga n1 en f1
+(2) l.d f2, n2(r0)      //carga n2 en f2
+
+(3) add.d f3, f2, f1    //suma f1 y f2 y guarda en f3
+(4) mul.d f4, f2, f1    //multiplica f1 y f2 y guarda en f4
+
+(5) s.d f3, res1(r0)    //guarda f3 en res1
+(6) s.d f4, res2(r0)    //guarda f4 en res2
+(7) halt                //fin del programa
+
+a) Tomar nota de la cantidad de ciclos, instrucciones y CPI luego de la ejecución del programa.
+
+    20 ciclos
+    7 instrucciones
+    CPI = 20/7 = 2.85
+
+b) ¿Cuántos atascos por dependencia de datos se generan? Observar en cada caso cuál es el dato en conflicto y las
+instrucciones involucradas.
+
+    La tercera instruccion; add.d f3, f2, f1 crea un atarsco RAW de 4 ciclos trabando la ejecucion de la cuarta instruccion; mul.d f4, f2, f1
+    La cuarta instruccion; mul.d f4, f2, f1 crea un atarsco RAW de 5 ciclos trabando la ejecucion de la quinta instruccion; s.d f3, res1(r0)
+    La quinta instruccion; s.d f3, res1(r0) tiene 1  atasco estructural, trabando la ejecucion de la sexta instruccion; s.d f4, res2(r0)
+    La sexta instruccion; s.d f4, res2(r0) tiene 1  atasco estructural, trabando la ejecucion de la septima instruccion; halt
+
+
+c) ¿Por qué se producen los atascos estructurales? Observar cuales son las instrucciones que los generan y en qué
+etapas del pipeline aparecen.
+
+    Los atascos estructurales se producen porque el pipeline no puede ejecutar mas de una instruccion por ciclo, y en este caso,
+    la quinta instruccion; s.d f3, res1(r0) y la sexta instruccion; s.d f4, res2(r0) se ejecutan en el mismo ciclo
+    por lo que se produce un atasco estructural.
+
+d) Modificar el programa agregando la instrucción mul.d f1, f2, f1 entre las instrucciones add.d y mul.d.
+Repetir la ejecución y observar los resultados. ¿Por qué aparece un atasco tipo WAR?
+
+    El atasco WAR aparece porque la instruccion mul.d f1, f2, f1 modifica el valor de f1, que es el valor que necesita la instruccion
+
+
+e) Explicar por qué colocando un NOP antes de la suma, se soluciona el RAW de la instrucción ADD y como
+consecuencia se elimina el WAR.
+
+    El NOP hace que la instruccion mul.d f1, f2, f1 se ejecute antes que la instruccion add.d f3, f2, f1, por lo que el valor de f1
+    no se modifica antes de que la instruccion add.d f3, f2, f1 lo necesite, solucionando el atasco WAR
