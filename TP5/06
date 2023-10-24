@@ -1,0 +1,55 @@
+Como ya se observó anteriormente, muchas instrucciones que normalmente forman parte del repertorio de un
+procesador con arquitectura CISC no existen en el MIPS64. En particular, el soporte para la invocación a subrutinas
+es mucho más simple que el provisto en la arquitectura x86 (pero no por ello menos potente). El siguiente programa
+muestra un ejemplo de invocación a una subrutina.
+
+.data
+valor1: .word 16
+valor2: .word 4
+result: .word 0
+
+.text
+ld $a0, valor1($zero)       # $a0 = 16 con corrida de 0 bytes
+ld $a1, valor2($zero)       # $a1 = 4 con corrida de 0 bytes
+jal a_la_potencia           # salta a la subrutina a_la_potencia
+
+sd $v0, result($zero)       # almacena el resultado en result
+
+halt
+
+#///subrutina///
+
+a_la_potencia:  daddi $v0, $zero, 1     #suma 0 + 1 y lo almacena en $v0, ira almacenando el resultado de la multiplicación
+         lazo:  slt $t1, $a1, $zero     #si $a1 < 0, $t1 = 1, sino $t1 = 0. $t1 es un registro temporal
+                bnez $t1, terminar      #si $t1 <> 0, salta a terminar si ya multiplico 4 veces
+                daddi $a1, $a1, -1      #si es 0 resta 1 a $a1. resto 1 al la cantidad de veces que se multiplica
+                dmul $v0, $v0, $a0      #multiplica $v0 * $a0 y lo almacena en $v0. hace la potencia
+                j lazo                  #salta a lazo
+      terminar: jr $ra                  #retorna a la dirección de memoria $ra
+
+a) ¿Qué hace el programa? ¿Cómo está estructurado el código del mismo?
+
+    Realiza una multiplicacion de 16 * 4, es decir 16^4. El código esta estructurado de la siguiente manera:
+    1) Carga los valores 16 y 4 en los registros $a0 y $a1 respectivamente.
+    2) Salta a la subrutina a_la_potencia.
+    3) Almacena el resultado en result.
+    4) Termina el programa.
+
+b) ¿Qué acciones produce la instrucción jal? ¿Y la instrucción jr?
+
+    La instrucción jal salta a la subrutina a_la_potencia y
+    la instrucción jr retorna a la dirección de memoria $ra.
+
+c) ¿Qué valor se almacena en el registro $ra? ¿Qué función cumplen los registros $a0 y $a1? ¿Y el registro $v0?
+
+    En el registro $ra se almacena la dirección de memoria a la que debe retornar la subrutina.
+    Los registros $a0 y $a1 son los registros de argumentos, en este caso se almacenan los valores 16 y 4 respectivamente.
+    El registro $v0 es el registro de retorno, en este caso se almacena el resultado de la multiplicación.
+
+d) ¿Qué sucedería si la subrutina a_la_potencia necesitara invocar a otra subrutina para realizar la multiplicación,
+por ejemplo, en lugar de usar la instrucción dmul? ¿Cómo sabría cada una de las subrutinas a que dirección de
+memoria deben retornar?
+
+    La subrutina MULTIPLICAR sobre-escribiría el valor de $v0, por lo que la subrutina a_la_potencia no podría retornar,
+    para solucionar esta el valor de $ra debería ser almacenado en la pila antes de llamar a la subrutina MULTIPLICAR y
+    luego recuperado para poder retornar.
