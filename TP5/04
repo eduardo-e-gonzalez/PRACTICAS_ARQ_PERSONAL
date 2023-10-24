@@ -18,31 +18,51 @@ IMC Clasificación Valor guardado
 ≥ 30 Obeso 4
 
 .data
-peso:       .double 0
-estatura:   .double 0
-imc:        .double 0
-estado:     .double 0
+peso:       .double 0.0
+estatura:   .double 0.0
+imc:        .double 0.0
+estado:     .word 0
 Infrapeso:  .double 18.5    <
 Normal:     .double 25      <
 Sobrepeso:  .double 30      <
 Obeso:      .double 30      >=
 
-
-
 .code
-l.d f1, peso
-l.d f2, estatura
-l.d f3, imc
-ld f4, estado
-ld f5, Infrapeso
-ld f6, Normal
-ld f7, Sobrepeso
-ld f8, Obeso
+        l.d f1, peso
+        l.d f2, estatura
+        l.d f3, imc
+        ld r4, estado
+        l.d f5, Infrapeso
+        l.d f6, Normal
+        l.d f7, Sobrepeso
+        l.d f8, Obeso
 
-mul.d f2, f2, f2    ;estatura^2
-div.D f1, f1, f2    ;peso/estatura^2
-c.lt.s f1,f5        ;si es menor que Infrapeso 1
-beq f
+        mul.d f2, f2, f2    ;estatura^2
+        div.D f1, f1, f2    ;peso/estatura^2
+        s.d f1, imc         ;guarda el imc
+
+        c.lt.s f3,f5        ;si es menor que Infrapeso 1/si es distinta 0
+        bclt infra          ;salta a infra
+        c.lt.s f3,f6        ;si es menor que Normal 2/si es distinta 0
+        bclt normal         ;salta a normal
+        c.lt.s f3,f7        ;si es menor que Sobrepeso 3/si es distinta 0
+        bclt sobrepeso      ;salta a sobrepeso
+        c.lt.s f3,f8        ;si es menor que Obeso 4/si es distinta 0
+        bclt obeso          ;salta a obeso
+        j fin               ;salta a fin
+       
+infra:      daddi r4, r4, 1  ;guarda el valor de r4
+            sd r4, estado(r0) ;guarda el valor de r4
+            j fin               ;salta a fin
+normal:     daddi r4, r4, 2  ;guarda el valor de r4
+            sd r4, estado(r0) ;guarda el valor de r4
+            j fin               ;salta a fin
+sobrepeso:  daddi r4, r4, 3  ;guarda el valor de r4
+            sd r4, estado(r0) ;guarda el valor de r4
+            j fin               ;salta a fin
+obeso:      daddi r4, r4, 4  ;guarda el valor de r4
+            sd r4, estado(r0) ;guarda el valor de r4
+
+fin:halt
 
 
-halt
