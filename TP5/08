@@ -31,4 +31,4 @@ loop:   lbu $t0, 0($a0)            ///copio valores a temporales
 
 fin_a0: bnez $t1, fin              ///si $t1 es distinto de 0, salto a fin;         cadena1=0, y cadena 2 =0?
         daddi $v0, $vo, -1         ///si no, retorno -1
-fin:    jr $ra                      ///retorno de subrutina 
+fin:    jr $ra                     ///retorno de subrutina 
