@@ -1,0 +1,34 @@
+*Escriba una subrutina que reciba como parámetros 
+las direcciones del comienzo de dos cadenas terminadas en cero y
+retorne la posición en la que las dos cadenas difieren. 
+En caso de que las dos cadenas sean idénticas, debe retornar -1.
+
+.data
+cadena1     .word "blabla"
+cadena2     .word "blabla"
+resultado   .word 0
+
+.code
+daddi $a0, $zero, cadena1           ///para enviar a sub debe estar en $a0-$a3
+daddi $a1, $zero, cadena2
+jal   comparar
+sd $v0, resultado                  ///para recibir de sub debe estar en $v0-$v1
+
+halt
+
+comparar:daddi $v0, $zero, 0       ///resultado pasado con $v0 (valor retorno de subrutina)
+loop:   lbu $t0, 0($a0)            ///copio valores a temporales
+        lbu $t1, 0($a1)            ///copio valores a temporales: en $t1 con desplazamiento 0 pongo $a1
+
+        beqz $t0, fin_a0           ///si $t0 es 0, salto a fin,                     cadena1; 0 ?
+        beqz $t1, fin              ///si $t1 es 0, salto a fin,                     cadena2; 0?
+
+        bne $t0, $t1, fin          ///si $t0 es distinto de $t1, salto a fin;       ambas cadenas =0?
+        daddi $a0,$a0,1            ///si no, incremento $a0 en 1
+        daddi $a1,$a1,1            ///si no, incremento $a1 en 1
+        daddi $v0,$v0,1            ///si no, incremento $v0 en 1 posicion
+        j   loop                   ///vuelvo a loop
+
+fin_a0: bnez $t1, fin              ///si $t1 es distinto de 0, salto a fin;         cadena1=0, y cadena 2 =0?
+        daddi $v0, $vo, -1         ///si no, retorno -1
+fin:    jr $ra                      ///retorno de subrutina 
