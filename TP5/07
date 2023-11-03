@@ -1,0 +1,33 @@
+///////////no se si esta bien ///////////
+
+
+.data
+tabla:  .word   34,68,120,3,15,167  #valores a comparar
+val     .word   26                  #valor a comparar
+cant    .word   6                   #cantidad de elementos en la tabla
+res     .word   0                   #resultado
+
+.code
+        daddi $a1, $0, tabla             #direccion de la tabla, avanzo de a 8
+        daddi $a2, $0, cant              #valor a comparar, si val es menor que...
+        daddi $a3, $0, 0                 #primer desplazamiento
+        daddi $a0,$0, 0                  #inicializo el contador
+
+        jal comp                         #llamo a la sub
+        sd $v0, res($0)                  #guardo el resultado en val
+        halt
+
+
+comp:   ld $t1, v($a3)           #cargo el primer elemento con desplazamiento r5
+        slt  $t4, $a1, $t1       #si el valor de la tabla es menor que el valor a comparar($t1 < $a2--> $t4 = 1)
+        bnez $t4, avan           #si es menor, salto a NO ES MAYOR
+
+esMayor:daddi $v0, $v0, 1                #incremento el contador
+        jr $ra
+
+avan:   daddi $t1, $a1,0         #limpio t1 para desplazamiento limpio
+        daddi $t1, $a3, 8        #avanzo de a 8 en la tabla
+        daddi $a3, $a3, -1       #reato en el tope de la tabla
+        bnez $a3, loop           #si no llegue al tope, vuelvo a loop
+        jr $ra
+        
