@@ -1,0 +1,21 @@
+9- *Escriba la subrutina ES_VOCAL que determina si un caracter es vocal o no, ya sea mayúscula o minúscula.
+La rutina debe recibir el caracter y debe retornar el valor 1 si es una vocal ó 0 en caso contrario.}
+
+.data
+caracter    .asiic    'E'
+vocales     .asiicz   'aeiouAEIOU'
+resultado   .word   0
+
+.code
+lbu $a0, caracter($zero)         #carga el caracter
+jal comparara                    #llama a la subrutina
+sw $v0, resultado($zero)         #guarda el resultado
+halt
+
+comparara:  lbu $t1, vocal($zero)  #carga la primer vocal
+            beq $a0, $t1, ES_VOCAL #si es igual a vocal salta a ES_VOCAL
+            addi $t1, $t1, 1       #si no es igual a vocal le suma 1
+            beq $t1, $zero, NO_ES  #si es igual a 0 salta a NO_ES
+
+ES_VOCAL:   daddi $v0, $v0, 1      #si es vocal ponel 0 en 1
+NO_ES:      jR $ra                 #NO_ES de principio esta en 0
