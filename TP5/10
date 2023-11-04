@@ -1,0 +1,48 @@
+Usando la subrutina escrita en el ejercicio anterior, escriir la subrutina CONTAR_VOC, que recibe una cadena
+terminada en cero y devuelve la cantidad de vocales que tiene esa cadena.
+
+#####
+ES_VOCAL :  lbu $t1, vocal($zero)  #carga la primer vocal
+            beq $a0, $t1, SI_ES #si es igual a vocal salta a SI_ES
+            addi $t1, $t1, 1       #si no es igual a vocal le suma 1
+            beq $t1, $zero, NO_ES  #si es igual a 0 salta a NO_ES
+#####
+
+.data
+caracteres  .asiicz   'EGahkIOv'
+vocales     .asiicz   'aeiouAEIOU'
+fin         .asiicz   'U'
+cantidad    .word     8
+resultado   .word   0
+
+.code
+            lbu $a0, caracteres($zero)         #carga el caracteres
+            lbu $a1, fin($zero)                #carga el fin
+            jal ES_VOCAL                    #llama a la subrutina
+            sw $v0, resultado($zero)         #guarda el resultado
+halt
+################## SUB 1 ##################
+ES_VOCAL :  daddi $sp, $sp,-8
+            sd $ra,0($sp)
+
+            lbu $t1, vocal($zero)       #carga la primer vocal
+            lbu $t0, fin($zero)         #carga fin de cadena
+    loop:   beq $a0, $t1, CONTAR_VOC    #A=A?            si es igual a vocal salta a CONTAR_VOC
+            beqz $t1, fin               #A=0?            si es igual a 0 salta a fin
+            beqz $t1, $t0, OTRO_CHAR    #compara con fin si es igual salta a OTRO_CHAR
+            addi $t1, $t1, 1            #A+1             si no es igual a vocal pasa al siguiente caracteres
+            j loop
+
+OTRO_CHAR:  daddi $t2, $t2, -           #cant-1          resto cantidad de caracteres
+            beqz $t2, fin               #cant=0?         si es igual a 0 salta a fin
+            daddi $a0, $a0, 1           #pasa al siguiente caracteres
+            j loop
+
+            j loop
+        fin:jR $ra              
+################## SUB 2 ##################
+CONTAR_VOC: daddi $v0, $v0, 1      #si es vocal ponel 0 en 1
+            jr $ra
+        
+        j loop
+NO_ES:      jR $ra                 #NO_ES de principio esta en 0
