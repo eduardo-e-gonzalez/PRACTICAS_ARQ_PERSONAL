@@ -1,0 +1,45 @@
+ni se si esta bien pero mepa que era para ese lado
+
+#Escribir una subrutina que reciba como argumento una tabla de números terminada en 0.
+#La subrutina debe contar la cantidad de números que son impares en la tabla. 
+#Ésta condición se debe verificar usando la subrutina ES_IMPAR.
+#La subrutina ES_IMPAR debe devolver 1 si el número es impar y 0 si no lo es.
+
+.data
+tabla   .asiicz   '1234567890'
+cant    .word     '0'
+
+.code
+lbu $a0, $zero, tabla
+lbu $a1, $zero, cant
+
+jal CONTAR
+
+sw $v0, $zero, cant
+halt
+
+#RECIBE LA TABLA Y LA RECORRE HASTA ENCONTRAR EL FIN
+CONTAR: daddi $sp, $sp, -8
+        sd $ra,0(sp)
+
+        lbu $t0, $a0($zero)     #carga el primer valor de la tabla
+        lbu $v0, $a1($zero)     #carga el valor de la cantidad de impares
+
+loop:   beqz $t0, 0, fin        #es =0?
+        jal ES_IMPAR            #llama a la sub para verificar si es par o impar
+        daddi $a0, $a0, 1       #avanza en la tabla
+        j loop
+
+fin:    ld $ra,0(sp)            #recupera el valor de $ra
+        daddi $sp, $sp, 8       #recupera el valor de $sp
+        jr $ra
+
+#VERIFICA SI ES PAR O IMPAR SUB 2
+ES_IMPAR:   beqz $t0, 0, fin   #es =0?
+            ddiv $t0, 2        #divide por 2
+            beqz $t0, 0, fin   #es par?
+            daddi $t1, $t1, 1  #suma 1 a la cantidad de impares
+            jr $ra
+     
+     fin:jr $ra
+         
