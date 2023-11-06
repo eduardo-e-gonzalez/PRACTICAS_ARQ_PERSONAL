@@ -1,0 +1,46 @@
+12) El siguiente programa espera usar una subrutina que calcule en forma recursiva
+el factorial de un número entero:
+...
+(1) La configuración inicial de la arquitectura del WinMIPS64 establece que el procesador
+posee un bus de direcciones de 10 bits para la memoria de datos.
+Por lo tanto, la mayor dirección dentro de la memoria de datos será de 210 = 1024 = 40016.
+
+a) *Implemente la subrutina factorial definida en forma recursiva. 
+Tenga presente que el factorial de un número entero N se calcula 
+como el producto de los números enteros entre 1 y n inclusive:
+factorial(n) = n! = n x (n-1) x (n-2) x … x 3 x 2 x 1
+
+b) ¿Es posible escribir la subrutina factorial sin utilizar una pila? Justifique:
+    
+    Es posible, pero no es recomendable; ya que se debe guardar el valor de n en un registro y luego decrementarlo, 
+    para luego volver a llamar a la subrutina factorial,
+    Lo que hace que se pierda el valor de n y no se pueda volver a llamar a la subrutina factorial.
+
+.data
+n: .word 10
+result: .word 0
+
+.text
+daddi $sp, $zero, 0x400     #Inicializa el puntero al tope de la pila (1)
+ld $a0, n($zero)        #Carga el valor del número a calcular su factorial
+jal factorial               #Llama a la subrutina factorial
+sd $v0, result($zero)       #Guarda el resultado en la variable result
+halt
+
+#Subrutina que calcula el factorial de un número
+factorial: beq $a0, 0          #si es 0, retorna 1
+           daddi $sp, $sp, -8  #Reserva espacio en la pila para guardar el valor de n y la dirección de retorno
+           sd $ra, 0($sp)      #Guarda la dirección de retorno en la pila
+           sd $a0, 4($sp)      #Guarda el valor de n en la pila. 
+    
+           daddi $a0, $a0, -1  #Decrementa el valor de n
+           jal factorial       #Llama a la subrutina factorial
+           
+           ld $a0, 4($sp)      #Recupera el valor de n
+           ld $ra, 0($sp)      #Recupera la dirección de retorno
+           daddi $sp, $sp, 8   #Libera el espacio de la pila
+
+           dmult $v0, $a0      #Multiplica el resultado de la subrutina por n
+           sb $v0              #Guarda el resultado en $v0
+           jr $ra              #Retorna a la dirección de retorno  
+   
